@@ -1,0 +1,140 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ------------------------------------------------------------------ */
+/* Adakings brand tokens                                               */
+/* ------------------------------------------------------------------ */
+:root {
+  --radius: 0.75rem;
+
+  /* Brand palette (fixed, on-brand hex — not theme-swappable) */
+  --brand-red: #ce1126;
+  --brand-red-dark: #a30d1e;
+  --brand-gold: #d4a017;
+  --brand-gold-dark: #ad8212;
+  --brand-black: #111111;
+  --brand-white: #ffffff;
+
+  /* Semantic theme tokens (light) */
+  --background: var(--brand-white);
+  --foreground: var(--brand-black);
+
+  --card: #ffffff;
+  --card-foreground: var(--brand-black);
+  --popover: #ffffff;
+  --popover-foreground: var(--brand-black);
+
+  --primary: var(--brand-red);
+  --primary-foreground: var(--brand-white);
+
+  --secondary: var(--brand-black);
+  --secondary-foreground: var(--brand-white);
+
+  --accent: var(--brand-gold);
+  --accent-foreground: var(--brand-black);
+
+  --muted: #f5f4f2;
+  --muted-foreground: #6b6b6b;
+
+  --destructive: #dc2626;
+  --destructive-foreground: var(--brand-white);
+
+  --border: #e7e5e2;
+  --input: #e7e5e2;
+  --ring: var(--brand-red);
+
+  --chart-1: var(--brand-red);
+  --chart-2: var(--brand-gold);
+  --chart-3: var(--brand-black);
+  --chart-4: #6b6b6b;
+  --chart-5: #a30d1e;
+}
+
+.dark {
+  --background: var(--brand-black);
+  --foreground: #f5f4f2;
+
+  --card: #171717;
+  --card-foreground: #f5f4f2;
+  --popover: #171717;
+  --popover-foreground: #f5f4f2;
+
+  --primary: var(--brand-red);
+  --primary-foreground: var(--brand-white);
+
+  --secondary: #f5f4f2;
+  --secondary-foreground: var(--brand-black);
+
+  --accent: var(--brand-gold);
+  --accent-foreground: var(--brand-black);
+
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+
+  --destructive: #f87171;
+  --destructive-foreground: var(--brand-black);
+
+  --border: #2a2a2a;
+  --input: #2a2a2a;
+  --ring: var(--brand-red);
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-dark: var(--brand-red-dark);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-dark: var(--brand-gold-dark);
+  --color-brand-black: var(--brand-black);
+  --color-brand-white: var(--brand-white);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --font-sans: var(--font-inter);
+
+  --container-page: 1280px;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+    outline-color: color-mix(in oklch, var(--color-ring) 50%, transparent);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+}
