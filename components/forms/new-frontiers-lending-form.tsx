@@ -1,12 +1,18 @@
 "use client";
 
 import * as React from "react";
+import { useActionState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "cn";
 import { trackEvent } from "@/lib/analytics";
+import {
+  submitNewFrontiersLending,
+  initialNewFrontiersLendingState,
+  type NewFrontiersLendingState,
+} from "@/lib/actions/new-frontiers";
 
 const DEFAULT_INVESTMENT_AMOUNTS = [
   "GHS 1,000",
@@ -22,15 +28,6 @@ const DEFAULT_ACKNOWLEDGEMENT_TEXT =
 
 const DEFAULT_SUBMIT_LABEL = "Request Lending Agreement";
 
-type LendingFormPayload = {
-  fullName: string;
-  phone: string;
-  email: string;
-  amount: string;
-  message: string;
-  acknowledged: boolean;
-};
-
 export function NewFrontiersLendingForm({
   investmentAmountOptions = DEFAULT_INVESTMENT_AMOUNTS,
   acknowledgementText = DEFAULT_ACKNOWLEDGEMENT_TEXT,
@@ -40,46 +37,32 @@ export function NewFrontiersLendingForm({
   acknowledgementText?: string;
   submitLabel?: string;
 }) {
-  const [submitted, setSubmitted] = React.useState(false);
+  const [state, formAction, isPending] = useActionState<NewFrontiersLendingState, FormData>(
+    submitNewFrontiersLending,
+    initialNewFrontiersLendingState,
+  );
   const [agreed, setAgreed] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const tracked = React.useRef(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
+  React.useEffect(() => {
+    if (state.status === "success" && !tracked.current) {
+      tracked.current = true;
+      trackEvent("new_frontiers_submit");
+    }
+  }, [state.status]);
 
-    const payload: LendingFormPayload = {
-      fullName: String(data.get("fullName") ?? ""),
-      phone: String(data.get("phone") ?? ""),
-      email: String(data.get("email") ?? ""),
-      amount: String(data.get("amount") ?? ""),
-      message: String(data.get("message") ?? ""),
-      acknowledged: data.get("acknowledged") === "on",
-    };
-
-    setIsSubmitting(true);
-    console.log("Operation New Frontiers — lending agreement request", payload);
-    trackEvent("new_frontiers_submit");
-    setIsSubmitting(false);
-    setSubmitted(true);
-  }
-
-  if (submitted) {
+  if (state.status === "success") {
     return (
       <div className="flex flex-col items-center gap-3 rounded-2xl border border-white/15 bg-white/5 p-10 text-center">
         <CheckCircle2 className="size-10 text-brand-gold" />
         <p className="text-lg font-semibold text-white">Request received</p>
-        <p className="max-w-sm text-sm text-white/70">
-          Thank you. We&rsquo;ll personally reach out with the lending agreement, repayment
-          schedule, and onboarding instructions.
-        </p>
+        <p className="max-w-sm text-sm text-white/70">{state.message}</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+    <form action={formAction} className="space-y-6" noValidate>
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="fullName" className="text-sm font-medium text-white">
@@ -90,8 +73,15 @@ export function NewFrontiersLendingForm({
             name="fullName"
             autoComplete="name"
             required
+            aria-invalid={Boolean(state.errors?.fullName)}
+            aria-describedby={state.errors?.fullName ? "fullName-error" : undefined}
             className="border-white/20 bg-white/10 text-white placeholder:text-white/50"
           />
+          {state.errors?.fullName ? (
+            <p id="fullName-error" className="text-xs font-medium text-red-400">
+              {state.errors.fullName}
+            </p>
+          ) : null}
         </div>
         <div className="space-y-2">
           <label htmlFor="phone" className="text-sm font-medium text-white">
@@ -103,8 +93,15 @@ export function NewFrontiersLendingForm({
             type="tel"
             autoComplete="tel"
             required
+            aria-invalid={Boolean(state.errors?.phone)}
+            aria-describedby={state.errors?.phone ? "phone-error" : undefined}
             className="border-white/20 bg-white/10 text-white placeholder:text-white/50"
           />
+          {state.errors?.phone ? (
+            <p id="phone-error" className="text-xs font-medium text-red-400">
+              {state.errors.phone}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -118,8 +115,15 @@ export function NewFrontiersLendingForm({
           type="email"
           autoComplete="email"
           required
+          aria-invalid={Boolean(state.errors?.email)}
+          aria-describedby={state.errors?.email ? "email-error" : undefined}
           className="border-white/20 bg-white/10 text-white placeholder:text-white/50"
         />
+        {state.errors?.email ? (
+          <p id="email-error" className="text-xs font-medium text-red-400">
+            {state.errors.email}
+          </p>
+        ) : null}
       </div>
 
       <div className="space-y-2">
@@ -131,6 +135,8 @@ export function NewFrontiersLendingForm({
           name="amount"
           required
           defaultValue=""
+          aria-invalid={Boolean(state.errors?.amount)}
+          aria-describedby={state.errors?.amount ? "amount-error" : undefined}
           className={cn(
             "h-8 w-full min-w-0 rounded-lg border border-white/20 bg-white/10 px-2.5 text-base text-white transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm",
             "[&_option]:text-foreground",
@@ -145,6 +151,11 @@ export function NewFrontiersLendingForm({
             </option>
           ))}
         </select>
+        {state.errors?.amount ? (
+          <p id="amount-error" className="text-xs font-medium text-red-400">
+            {state.errors.amount}
+          </p>
+        ) : null}
       </div>
 
       <div className="space-y-2">
@@ -160,25 +171,40 @@ export function NewFrontiersLendingForm({
         />
       </div>
 
-      <label htmlFor="acknowledged" className="flex items-start gap-3 text-sm text-white/80">
-        <input
-          id="acknowledged"
-          name="acknowledged"
-          type="checkbox"
-          required
-          checked={agreed}
-          onChange={(event) => setAgreed(event.target.checked)}
-          className="mt-0.5 size-4 shrink-0 rounded border-white/30 bg-white/10 text-primary focus-visible:ring-3 focus-visible:ring-ring/50"
-        />
-        <span>{acknowledgementText}</span>
-      </label>
+      <div className="space-y-2">
+        <label htmlFor="acknowledged" className="flex items-start gap-3 text-sm text-white/80">
+          <input
+            id="acknowledged"
+            name="acknowledged"
+            type="checkbox"
+            required
+            checked={agreed}
+            onChange={(event) => setAgreed(event.target.checked)}
+            aria-invalid={Boolean(state.errors?.acknowledged)}
+            aria-describedby={state.errors?.acknowledged ? "acknowledged-error" : undefined}
+            className="mt-0.5 size-4 shrink-0 rounded border-white/30 bg-white/10 text-primary focus-visible:ring-3 focus-visible:ring-ring/50"
+          />
+          <span>{acknowledgementText}</span>
+        </label>
+        {state.errors?.acknowledged ? (
+          <p id="acknowledged-error" className="text-xs font-medium text-red-400">
+            {state.errors.acknowledged}
+          </p>
+        ) : null}
+      </div>
+
+      {state.status === "error" && state.message ? (
+        <p role="alert" className="text-sm font-medium text-red-400">
+          {state.message}
+        </p>
+      ) : null}
 
       <Button
         type="submit"
-        disabled={!agreed || isSubmitting}
+        disabled={!agreed || isPending}
         className="h-11 w-full bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark"
       >
-        {isSubmitting ? "Submitting…" : submitLabel}
+        {isPending ? "Submitting…" : submitLabel}
       </Button>
     </form>
   );

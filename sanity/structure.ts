@@ -50,6 +50,7 @@ const explicitCollectionTypes = new Set([
   "menuCategory",
   "menuItem",
   "privateLandingPage",
+  "newFrontiersLead",
 ]);
 
 export const structure: StructureResolver = (S) =>
@@ -130,6 +131,9 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("privateLandingPage")
         .title("Private Landing Pages")
         .icon(LockIcon),
+      S.documentTypeListItem("newFrontiersLead")
+        .title("Lending Enquiries")
+        .icon(EnvelopeIcon),
       S.divider(),
       singleton(S, "siteSettings", "Settings", CogIcon),
       // Safety net: surfaces any future document type that hasn't been

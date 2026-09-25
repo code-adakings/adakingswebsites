@@ -31,6 +31,7 @@ import { whyAdakings } from "./documents/whyAdakings";
 import { journalPage } from "./documents/journalPage";
 import { branchesPage } from "./documents/branchesPage";
 import { privateLandingPage } from "./documents/privateLandingPage";
+import { newFrontiersLead } from "./documents/newFrontiersLead";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -59,6 +60,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     menuCategory,
     menuItem,
     privateLandingPage,
+    newFrontiersLead,
     // Reusable objects
     seo,
     ctaLink,
