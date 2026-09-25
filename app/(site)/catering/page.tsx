@@ -30,7 +30,7 @@ export default async function CateringPage() {
       />
       <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
       <Section>
-        <Container className="grid items-center gap-12 lg:grid-cols-2">
+        <Container className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">What we offer</h2>
             <ul className="mt-6 space-y-4">

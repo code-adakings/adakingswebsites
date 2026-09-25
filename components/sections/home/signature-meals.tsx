@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
+import { ScrollRail, ScrollRailItem } from "@/components/ui/scroll-rail";
 import { Button } from "@/components/ui/button";
 import { getFeaturedMenuItems, getMenuPage } from "@/lib/menu";
 import { urlFor } from "@/sanity/lib/image";
@@ -36,15 +37,15 @@ export async function SignatureMeals() {
           </Button>
         </div>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ScrollRail className="mt-8 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
           {meals.map((meal) => (
-            <div key={meal.slug} className="group">
+            <ScrollRailItem key={meal.slug} className="w-[62%] group">
               <div className="relative aspect-4/3 overflow-hidden rounded-2xl bg-muted">
                 <Image
                   src={meal.image?.asset ? urlFor(meal.image).url() : meal.fallbackSrc ?? ""}
                   alt={meal.name}
                   fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 62vw"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
@@ -55,9 +56,9 @@ export async function SignatureMeals() {
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{meal.description}</p>
-            </div>
+            </ScrollRailItem>
           ))}
-        </div>
+        </ScrollRail>
 
         <Button variant="outline" render={<Link href="/menu" />} className="mt-8 w-full sm:hidden">
           View Full Menu

@@ -24,7 +24,7 @@ export function OpenPositions({
   return (
     <Section id="open-roles" className="scroll-mt-24">
       <Container>
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
           <SectionHeading
             eyebrow="Open Positions"
             title="Current opportunities"
@@ -50,11 +50,11 @@ export function OpenPositions({
         </Button>
 
         {careers.length === 0 ? (
-          <p className="mt-12 text-muted-foreground">
+          <p className="mt-8 text-muted-foreground sm:mt-12">
             No open roles right now — check back soon, or send us your CV above.
           </p>
         ) : (
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
             {careers.map((role) => (
               <div
                 key={role.slug}

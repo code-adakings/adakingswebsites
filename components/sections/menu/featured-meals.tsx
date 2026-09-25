@@ -12,7 +12,7 @@ export async function FeaturedMeals() {
     <Section id="featured" className="scroll-mt-32">
       <Container>
         <SectionHeading eyebrow="Featured" title="Fan favorites" />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:mt-12 sm:gap-6 lg:grid-cols-4">
           {meals.map((meal) => (
             <MenuItemCard key={meal.slug} item={{ ...meal, featured: true }} />
           ))}

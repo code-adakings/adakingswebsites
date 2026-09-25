@@ -18,7 +18,7 @@ export function FranchiseProspectusCta({
 }) {
   return (
     <section id="prospectus" className="bg-brand-black text-white">
-      <Container className="py-20 text-center sm:py-24">
+      <Container className="py-14 text-center sm:py-24">
         {heading ? (
           <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             {heading}

@@ -32,7 +32,7 @@ export function NewFrontiersCta({
           ) : null}
         </Reveal>
 
-        <Reveal delay={0.1} className="mt-12">
+        <Reveal delay={0.1} className="mt-8 sm:mt-12">
           <NewFrontiersLendingForm
             investmentAmountOptions={investmentAmountOptions}
             acknowledgementText={acknowledgementText}

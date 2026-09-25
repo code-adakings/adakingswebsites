@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, MapPin, Briefcase } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
+import { ScrollRail, ScrollRailItem } from "@/components/ui/scroll-rail";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrackClick } from "@/components/analytics/track-click";
@@ -26,11 +27,11 @@ export async function Careers() {
         </div>
 
         {openCareers.length > 0 ? (
-          <div className="mt-12 grid gap-4 sm:grid-cols-3">
+          <ScrollRail className="mt-8 sm:mt-12 sm:grid-cols-3 sm:gap-4">
             {openCareers.map((career) => (
-              <div
+              <ScrollRailItem
                 key={career.slug}
-                className="flex flex-col rounded-2xl border border-border bg-background p-6"
+                className="flex w-[80%] flex-col rounded-2xl border border-border bg-background p-6"
               >
                 <h3 className="text-base font-semibold">{career.title}</h3>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -52,9 +53,9 @@ export async function Careers() {
                     <ArrowRight className="size-4" />
                   </Button>
                 </TrackClick>
-              </div>
+              </ScrollRailItem>
             ))}
-          </div>
+          </ScrollRail>
         ) : (
           <p className="mt-12 text-sm text-muted-foreground">
             No open positions right now — check back soon.

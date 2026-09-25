@@ -23,7 +23,7 @@ export function BranchCard({ branch }: { branch: SanityBranch }) {
         className="aspect-4/3 rounded-none"
         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
       />
-      <div className="flex flex-1 flex-col p-6">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <h3 className="text-lg font-semibold">{branch.name}</h3>
           {!isOpen ? (

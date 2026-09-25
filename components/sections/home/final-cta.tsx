@@ -21,15 +21,15 @@ export function FinalCta({
   primaryCtaEvent?: AnalyticsEventName | null;
 }) {
   return (
-    <section className="bg-primary py-16 text-primary-foreground md:py-24">
+    <section className="bg-primary py-12 text-primary-foreground sm:py-16 md:py-24">
       <Container className="text-center">
         <h2 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
           {heading}
         </h2>
-        <p className="mx-auto mt-4 max-w-lg text-primary-foreground/80 text-pretty">
+        <p className="mx-auto mt-3 max-w-lg text-primary-foreground/80 text-pretty sm:mt-4">
           {description}
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:mt-8">
           <Button
             size="lg"
             variant="secondary"

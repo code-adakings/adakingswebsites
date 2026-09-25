@@ -26,7 +26,7 @@ export function Hero({
   return (
     <section className="relative overflow-hidden bg-brand-black text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,color-mix(in_oklch,var(--color-brand-red)_35%,transparent),transparent_55%)]" />
-      <Container className="relative grid gap-12 py-20 lg:grid-cols-2 lg:items-center lg:py-28">
+      <Container className="relative grid gap-10 py-14 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-12 lg:py-28">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -37,13 +37,13 @@ export function Hero({
               {eyebrow}
             </span>
           ) : null}
-          <h1 className="mt-6 text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
+          <h1 className="mt-5 text-4xl font-bold tracking-tight text-balance sm:mt-6 sm:text-5xl lg:text-6xl">
             {heading}
           </h1>
           {subheading ? (
-            <p className="mt-6 max-w-lg text-lg text-white/70 text-pretty">{subheading}</p>
+            <p className="mt-4 max-w-lg text-lg text-white/70 text-pretty sm:mt-6">{subheading}</p>
           ) : null}
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div className="mt-6 flex flex-wrap items-center gap-4 sm:mt-8">
             {primaryCta ? (
               <Button
                 size="lg"
@@ -76,7 +76,7 @@ export function Hero({
           <SanityImage
             image={backgroundImage}
             fallbackLabel="Signature meal — hero photography"
-            className="aspect-4/5 w-full lg:aspect-square"
+            className="aspect-4/3 w-full sm:aspect-4/5 lg:aspect-square"
             sizes="(min-width: 1024px) 50vw, 100vw"
             priority
           />

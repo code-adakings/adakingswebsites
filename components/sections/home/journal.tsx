@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
+import { ScrollRail, ScrollRailItem } from "@/components/ui/scroll-rail";
 import { Button } from "@/components/ui/button";
 import { PostCard } from "@/components/journal/post-card";
 import { getAllPosts } from "@/lib/journal";
@@ -20,11 +21,13 @@ export async function LatestJournal() {
           </Button>
         </div>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-3">
+        <ScrollRail className="mt-8 sm:mt-12 sm:grid-cols-3 sm:gap-8">
           {posts.map((post) => (
-            <PostCard key={post.slug} post={post} />
+            <ScrollRailItem key={post.slug} className="w-[80%]">
+              <PostCard post={post} />
+            </ScrollRailItem>
           ))}
-        </div>
+        </ScrollRail>
 
         <Button variant="outline" render={<Link href="/journal" />} className="mt-8 w-full sm:hidden">
           Read the Journal

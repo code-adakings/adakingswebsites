@@ -5,7 +5,7 @@ export function Section({
   ...props
 }: React.ComponentProps<"section">) {
   return (
-    <section className={cn("py-16 md:py-24", className)} {...props} />
+    <section className={cn("py-12 sm:py-16 md:py-24", className)} {...props} />
   );
 }
 

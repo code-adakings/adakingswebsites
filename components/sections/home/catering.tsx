@@ -20,19 +20,19 @@ export async function Catering() {
             sizes="100vw"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-          <div className="absolute inset-0 flex flex-col justify-end p-8 text-white sm:p-12">
+          <div className="absolute inset-0 flex flex-col justify-end p-6 text-white sm:p-12">
             <span className="text-sm font-semibold tracking-wide text-brand-gold uppercase">
               Catering
             </span>
-            <h2 className="mt-3 max-w-xl text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+            <h2 className="mt-2 max-w-xl text-2xl font-bold tracking-tight text-balance sm:mt-3 sm:text-4xl">
               {homeCta.heading}
             </h2>
-            <p className="mt-3 max-w-lg text-white/80 text-pretty">{homeCta.description}</p>
+            <p className="mt-2 max-w-lg text-white/80 text-pretty sm:mt-3">{homeCta.description}</p>
             <TrackClick event="catering_quote" params={{ location: "home_catering_teaser" }}>
               <Button
                 size="lg"
                 render={<a href={homeCta.cta?.href ?? "/catering"} />}
-                className="mt-6 h-11 w-fit bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark"
+                className="mt-4 h-11 w-fit bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark sm:mt-6"
               >
                 {homeCta.cta?.label ?? "Request Catering"}
                 <ArrowRight className="size-4" />

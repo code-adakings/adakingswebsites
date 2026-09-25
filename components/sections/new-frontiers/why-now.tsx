@@ -26,7 +26,7 @@ export function NewFrontiersWhyNow({
   return (
     <Section>
       <Container>
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
           <Reveal>
             {heading ? (
               <h2 className="sticky top-24 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">

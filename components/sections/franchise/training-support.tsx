@@ -18,7 +18,7 @@ export function FranchiseTrainingSupport({
     <Section className="bg-muted/40">
       <Container>
         <SectionHeading eyebrow={eyebrow} title={heading ?? ""} align="center" className="mx-auto" />
-        <div className="mt-12 grid gap-10 sm:grid-cols-3">
+        <div className="mt-8 grid gap-8 sm:mt-12 sm:grid-cols-3 sm:gap-10">
           {columns.map(({ title, description, image }) => (
             <div key={title}>
               <SanityImage image={image} fallbackLabel={title} className="aspect-4/3" sizes="(min-width: 640px) 33vw, 100vw" />

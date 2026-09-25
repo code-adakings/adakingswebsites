@@ -27,27 +27,27 @@ export function NewFrontiersHero({
 }) {
   return (
     <section className="relative overflow-hidden bg-background">
-      <Container className="relative py-24 sm:py-28 lg:py-32">
+      <Container className="relative py-14 sm:py-24 lg:py-32">
         <Reveal>
           {eyebrow ? (
             <p className="text-xs font-semibold tracking-[0.2em] text-primary uppercase">
               {eyebrow}
             </p>
           ) : null}
-          <h1 className="mt-6 max-w-4xl text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
+          <h1 className="mt-5 max-w-4xl text-4xl font-semibold tracking-tight text-balance sm:mt-6 sm:text-6xl lg:text-7xl">
             {heading}
           </h1>
           {subheading ? (
-            <p className="mt-8 max-w-3xl text-2xl font-medium text-balance text-foreground/80 sm:text-3xl lg:text-4xl">
+            <p className="mt-5 max-w-3xl text-xl font-medium text-balance text-foreground/80 sm:mt-8 sm:text-3xl lg:text-4xl">
               {subheading}
             </p>
           ) : null}
           {description ? (
-            <p className="mt-6 max-w-2xl text-base text-muted-foreground text-pretty sm:text-lg">
+            <p className="mt-4 max-w-2xl text-base text-muted-foreground text-pretty sm:mt-6 sm:text-lg">
               {description}
             </p>
           ) : null}
-          <div className="mt-10 flex flex-wrap items-center gap-4">
+          <div className="mt-7 flex flex-wrap items-center gap-4 sm:mt-10">
             {primaryCtaLabel ? (
               <Button
                 size="lg"
@@ -71,7 +71,7 @@ export function NewFrontiersHero({
         </Reveal>
 
         {heroImage?.asset ? (
-          <Reveal delay={0.1} className="mt-16">
+          <Reveal delay={0.1} className="mt-10 sm:mt-16">
             <SanityImage
               image={heroImage}
               fallbackLabel={heading}
@@ -85,7 +85,7 @@ export function NewFrontiersHero({
         {metrics.length > 0 ? (
           <Reveal
             delay={0.15}
-            className="mt-16 grid grid-cols-1 gap-8 border-t border-border pt-10 sm:grid-cols-3"
+            className="mt-10 grid grid-cols-1 gap-6 border-t border-border pt-8 sm:mt-16 sm:grid-cols-3 sm:gap-8 sm:pt-10"
           >
             {metrics.map((metric) => (
               <div key={metric.label}>

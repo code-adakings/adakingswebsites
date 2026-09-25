@@ -32,7 +32,7 @@ export function BranchServices({
           align="center"
           className="mx-auto"
         />
-        <div className="mt-12 grid gap-8 sm:grid-cols-3">
+        <div className="mt-8 grid gap-6 sm:mt-12 sm:grid-cols-3 sm:gap-8">
           {items.map(({ icon, title: itemTitle, description: itemDescription }) => {
             const Icon = SERVICE_ICONS[icon] ?? Utensils;
             return (

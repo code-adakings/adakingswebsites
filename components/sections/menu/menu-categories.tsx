@@ -11,8 +11,8 @@ export function MenuCategories({ categories }: { categories: MenuCategorySection
         <Section key={category.slug} id={category.slug} className="scroll-mt-32">
           <Container>
             <SectionHeading title={category.title} description={category.description} />
-            <Separator className="mt-8 mb-10" />
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            <Separator className="mt-6 mb-8 sm:mt-8 sm:mb-10" />
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-4">
               {category.items.map((item) => (
                 <MenuItemCard key={item.slug} item={item} />
               ))}

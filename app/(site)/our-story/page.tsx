@@ -116,12 +116,12 @@ export default async function OurStoryPage() {
       </Section>
 
       {/* 7. Vision 2030 */}
-      <section className="bg-brand-black py-20 text-white sm:py-28">
+      <section className="bg-brand-black py-14 text-white sm:py-28">
         <Container className="max-w-3xl text-center">
           <p className="text-sm font-semibold tracking-wide text-brand-gold uppercase">
             Vision 2030
           </p>
-          <p className="mt-6 text-2xl leading-relaxed font-medium text-balance sm:text-3xl">
+          <p className="mt-4 text-xl leading-relaxed font-medium text-balance sm:mt-6 sm:text-3xl">
             {siteSettings.longDescription}
           </p>
         </Container>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MapPin, ArrowRight, Bike, ShoppingBag } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
+import { ScrollRail, ScrollRailItem } from "@/components/ui/scroll-rail";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PlaceholderImage } from "@/components/ui/placeholder-image";
@@ -52,11 +53,11 @@ export async function BranchesPreview({
           )}
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <ScrollRail className="mt-8 sm:grid-cols-3 sm:gap-4">
           {branches.map((branch) => (
-            <div
+            <ScrollRailItem
               key={branch.slug}
-              className="flex flex-col rounded-2xl border border-border bg-background p-6"
+              className="flex w-[80%] flex-col rounded-2xl border border-border bg-background p-6"
             >
               <div className="flex items-start justify-between gap-2">
                 <MapPin className="size-5 text-primary" />
@@ -87,9 +88,9 @@ export async function BranchesPreview({
               >
                 View Branch
               </Button>
-            </div>
+            </ScrollRailItem>
           ))}
-        </div>
+        </ScrollRail>
 
         <Button variant="outline" render={<Link href="/branches" />} className="mt-8 w-full sm:hidden">
           View All Branches

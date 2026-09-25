@@ -11,7 +11,7 @@ export async function OurStory() {
 
   return (
     <Section>
-      <Container className="grid items-center gap-12 lg:grid-cols-2">
+      <Container className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
         <SanityImage
           image={image}
           fallbackLabel="Our founders, early days"

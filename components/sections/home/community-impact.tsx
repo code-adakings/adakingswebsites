@@ -8,10 +8,10 @@ export async function CommunityImpact() {
 
   return (
     <Section className="bg-muted/40">
-      <Container className="grid items-center gap-12 lg:grid-cols-2">
+      <Container className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
         <div>
           <SectionHeading eyebrow={eyebrow} title={heading} description={description} />
-          <dl className="mt-8 space-y-6">
+          <dl className="mt-6 space-y-4 sm:mt-8 sm:space-y-6">
             {initiatives.map((item) => (
               <div key={item.title} className="border-l-2 border-primary pl-4">
                 <dt className="font-semibold">{item.title}</dt>

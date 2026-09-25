@@ -25,7 +25,7 @@ export function FranchiseAdvantages({
     <Section className="bg-muted/40">
       <Container>
         <SectionHeading eyebrow={eyebrow} title={heading ?? ""} align="center" className="mx-auto" />
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-6 sm:mt-12 sm:gap-8 lg:grid-cols-4">
           {cards.map(({ icon, title, description }) => {
             const Icon = ICONS[icon] ?? ShieldCheck;
             return (

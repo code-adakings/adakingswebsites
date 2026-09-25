@@ -43,8 +43,8 @@ export default async function ContactPage() {
       />
       <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
       <Section>
-        <Container className="grid gap-12 lg:grid-cols-[1fr_1.2fr]">
-          <div className="space-y-6">
+        <Container className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:gap-12">
+          <div className="space-y-5 sm:space-y-6">
             <div>
               <p className="text-lg font-semibold">{settings.siteName}</p>
               {settings.legalName ? (

@@ -29,23 +29,23 @@ export function BranchesHero({
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-brand-black via-brand-black/60 to-brand-black/20" />
-      <Container className="relative py-24 sm:py-32">
+      <Container className="relative py-16 sm:py-24 lg:py-32">
         {eyebrow ? (
           <p className="text-sm font-semibold tracking-wide text-brand-gold uppercase">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="mt-3 max-w-2xl text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+        <h1 className="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-balance sm:text-5xl">
           {title}
         </h1>
         {description ? (
-          <p className="mt-4 max-w-xl text-white/70 text-pretty">{description}</p>
+          <p className="mt-3 max-w-xl text-white/70 text-pretty sm:mt-4">{description}</p>
         ) : null}
         {cta ? (
           <Button
             size="lg"
             render={<a href={cta.href} />}
-            className="mt-8 h-11 bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark"
+            className="mt-6 h-11 bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark sm:mt-8"
           >
             {cta.label}
             <ArrowRight className="size-4" />

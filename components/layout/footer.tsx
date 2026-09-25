@@ -27,8 +27,8 @@ export function Footer({
 
   return (
     <footer className="bg-brand-black text-white">
-      <Container className="py-16">
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
+      <Container className="py-12 sm:py-16">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 sm:gap-x-10 lg:grid-cols-6">
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" aria-label={`${siteName} home`} className="inline-flex items-center gap-2.5">
               <Image

@@ -28,8 +28,8 @@ export function NewFrontiersInvestmentTerms({
         ) : null}
 
         {headlineRate ? (
-          <Reveal delay={0.1} className="mt-12 rounded-3xl border border-border bg-card p-10 text-center sm:p-14">
-            <p className="text-6xl font-semibold tracking-tight text-primary sm:text-7xl">
+          <Reveal delay={0.1} className="mt-8 rounded-3xl border border-border bg-card p-7 text-center sm:mt-12 sm:p-14">
+            <p className="text-5xl font-semibold tracking-tight text-primary sm:text-7xl">
               {headlineRate}
             </p>
             {rateCaption ? (

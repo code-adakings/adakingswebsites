@@ -19,7 +19,7 @@ export function EmployeeValues({
     <Section className="bg-muted/40">
       <Container>
         <SectionHeading eyebrow={eyebrow} title={heading ?? ""} description={description} align="center" className="mx-auto" />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {values.map((value) => (
             <div key={value.title} className="rounded-2xl border border-border bg-background p-6">
               <h3 className="text-lg font-semibold">{value.title}</h3>

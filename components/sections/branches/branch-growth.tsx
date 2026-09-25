@@ -16,7 +16,7 @@ export function BranchGrowth({
 }) {
   return (
     <Section>
-      <Container className="grid items-center gap-12 lg:grid-cols-2">
+      <Container className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
         <div>
           {eyebrow ? (
             <p className="text-sm font-semibold tracking-wide text-primary uppercase">

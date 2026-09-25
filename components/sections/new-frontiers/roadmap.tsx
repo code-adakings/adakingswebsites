@@ -27,11 +27,11 @@ export function NewFrontiersRoadmap({
 
         <Reveal
           delay={0.1}
-          className="mt-16 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center"
+          className="mt-10 flex flex-col items-stretch gap-4 sm:mt-16 sm:flex-row sm:items-center sm:justify-center"
         >
           {phases.map((phase, index) => (
             <div key={phase.label} className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
-              <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 sm:w-80">
+              <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 sm:w-80 sm:p-8">
                 {phase.status ? (
                   <Badge variant={phase.isCurrent ? "default" : "outline"} className="h-6 px-2.5">
                     {phase.status}
@@ -57,7 +57,7 @@ export function NewFrontiersRoadmap({
 
         {caption ? (
           <Reveal delay={0.2}>
-            <p className="mt-12 text-center text-sm text-muted-foreground italic">{caption}</p>
+            <p className="mt-8 text-center text-sm text-muted-foreground italic sm:mt-12">{caption}</p>
           </Reveal>
         ) : null}
       </Container>

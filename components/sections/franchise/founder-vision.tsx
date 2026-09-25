@@ -18,11 +18,11 @@ export function FounderVision({
 
   return (
     <Section>
-      <Container className="grid gap-12 lg:grid-cols-2 lg:items-center">
+      <Container className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
         <SanityImage
           image={image}
           fallbackLabel="Adakings founder"
-          className="aspect-4/5"
+          className="aspect-4/3 sm:aspect-4/5"
           sizes="(min-width: 1024px) 50vw, 100vw"
         />
         <div>
