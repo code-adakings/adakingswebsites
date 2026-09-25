@@ -10,9 +10,10 @@ import { cn } from "cn";
 import { trackEvent } from "@/lib/analytics";
 import {
   submitNewFrontiersLending,
-  initialNewFrontiersLendingState,
   type NewFrontiersLendingState,
 } from "@/lib/actions/new-frontiers";
+
+const initialNewFrontiersLendingState: NewFrontiersLendingState = { status: "idle" };
 
 const DEFAULT_INVESTMENT_AMOUNTS = [
   "GHS 1,000",

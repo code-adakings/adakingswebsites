@@ -14,8 +14,6 @@ export type NewFrontiersLendingState = {
   errors?: NewFrontiersFieldErrors;
 };
 
-export const initialNewFrontiersLendingState: NewFrontiersLendingState = { status: "idle" };
-
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function field(formData: FormData, name: string) {
