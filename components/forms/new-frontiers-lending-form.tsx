@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,6 +59,14 @@ export function NewFrontiersLendingForm({
         <CheckCircle2 className="size-10 text-brand-gold" />
         <p className="text-lg font-semibold text-white">Request received</p>
         <p className="max-w-sm text-sm text-white/70">{state.message}</p>
+        {state.applicationPath ? (
+          <Link
+            href={state.applicationPath}
+            className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-brand-gold hover:underline"
+          >
+            View your application <ArrowRight className="size-4" />
+          </Link>
+        ) : null}
       </div>
     );
   }
@@ -123,6 +132,26 @@ export function NewFrontiersLendingForm({
         {state.errors?.email ? (
           <p id="email-error" className="text-xs font-medium text-red-400">
             {state.errors.email}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="address" className="text-sm font-medium text-white">
+          Residential Address
+        </label>
+        <Input
+          id="address"
+          name="address"
+          autoComplete="street-address"
+          required
+          aria-invalid={Boolean(state.errors?.address)}
+          aria-describedby={state.errors?.address ? "address-error" : undefined}
+          className="border-white/20 bg-white/10 text-white placeholder:text-white/50"
+        />
+        {state.errors?.address ? (
+          <p id="address-error" className="text-xs font-medium text-red-400">
+            {state.errors.address}
           </p>
         ) : null}
       </div>

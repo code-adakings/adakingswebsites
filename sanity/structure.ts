@@ -24,6 +24,8 @@ import {
 } from "@sanity/icons";
 import type { StructureResolver } from "sanity/structure";
 import { singletonTypes } from "./schemaTypes";
+import { LENDING_SETTINGS_ID } from "./schemaTypes/documents/lendingSettings";
+import { STATUSES, STATUS_LABELS } from "../lib/lending/shared";
 
 const singleton = (
   S: Parameters<StructureResolver>[0],
@@ -51,6 +53,8 @@ const explicitCollectionTypes = new Set([
   "menuItem",
   "privateLandingPage",
   "newFrontiersLead",
+  "lendingApplication",
+  "lendingSettings",
 ]);
 
 export const structure: StructureResolver = (S) =>
@@ -131,9 +135,39 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("privateLandingPage")
         .title("Private Landing Pages")
         .icon(LockIcon),
-      S.documentTypeListItem("newFrontiersLead")
-        .title("Lending Enquiries")
-        .icon(EnvelopeIcon),
+      S.listItem()
+        .title("Operation New Frontiers")
+        .icon(RocketIcon)
+        .child(
+          S.list()
+            .title("Operation New Frontiers")
+            .items([
+              ...STATUSES.map((status) =>
+                S.listItem()
+                  .id(`lending-${status}`)
+                  .title(STATUS_LABELS[status])
+                  .icon(DocumentTextIcon)
+                  .child(
+                    S.documentList()
+                      .title(STATUS_LABELS[status])
+                      .schemaType("lendingApplication")
+                      .filter('_type == "lendingApplication" && status == $status')
+                      .params({ status })
+                      .defaultOrdering([{ field: "appliedAt", direction: "desc" }]),
+                  ),
+              ),
+              S.documentTypeListItem("lendingApplication").title("All Applications"),
+              S.divider(),
+              S.listItem()
+                .title("Lending Settings")
+                .id("lendingSettings")
+                .icon(CogIcon)
+                .child(S.document().schemaType("lendingSettings").documentId(LENDING_SETTINGS_ID)),
+              S.documentTypeListItem("newFrontiersLead")
+                .title("Legacy Enquiries")
+                .icon(EnvelopeIcon),
+            ]),
+        ),
       S.divider(),
       singleton(S, "siteSettings", "Settings", CogIcon),
       // Safety net: surfaces any future document type that hasn't been

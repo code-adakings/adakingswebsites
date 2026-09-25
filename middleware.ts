@@ -11,7 +11,9 @@ const STUDIO_HOSTNAME = "studio.adakings.com";
 export function middleware(request: NextRequest) {
   const host = request.headers.get("host") || "";
 
-  if (host === STUDIO_HOSTNAME) {
+  // API routes stay unrewritten so Studio code can call them (e.g. the
+  // lending workflow's /api/lending/notify) from the subdomain too.
+  if (host === STUDIO_HOSTNAME && !request.nextUrl.pathname.startsWith("/api/")) {
     const url = request.nextUrl.clone();
     url.pathname = `/studio${request.nextUrl.pathname}`;
     return NextResponse.rewrite(url);

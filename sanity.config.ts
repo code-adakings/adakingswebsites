@@ -8,6 +8,12 @@ import { apiVersion, dataset, projectId, studioPreviewOrigin } from "./sanity/en
 import { schema } from "./sanity/schemaTypes";
 import { structure } from "./sanity/structure";
 import { resolve } from "./sanity/presentation/resolve";
+import { LendingTransitionAction } from "./sanity/lending/actions";
+import { lendingPipelineTool } from "./sanity/lending/pipeline-tool";
+
+// Lending applications are only ever created by the site's form (which
+// issues the lender's private token), and settings is a fixed-id singleton.
+const LENDING_TYPES = new Set(["lendingApplication", "lendingSettings"]);
 
 export default defineConfig({
   basePath: "/studio",
@@ -29,4 +35,20 @@ export default defineConfig({
     }),
     ...(process.env.NODE_ENV === "development" ? [visionTool({ defaultApiVersion: apiVersion })] : []),
   ],
+  tools: (prev) => [...prev, lendingPipelineTool],
+  document: {
+    newDocumentOptions: (prev) => prev.filter((item) => !LENDING_TYPES.has(item.templateId)),
+    actions: (prev, { schemaType }) => {
+      if (schemaType === "lendingApplication") {
+        return [
+          LendingTransitionAction,
+          ...prev.filter(({ action }) => action !== "duplicate" && action !== "unpublish"),
+        ];
+      }
+      if (schemaType === "lendingSettings") {
+        return prev.filter(({ action }) => action === "publish" || action === "discardChanges");
+      }
+      return prev;
+    },
+  },
 });

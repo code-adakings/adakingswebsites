@@ -32,6 +32,8 @@ import { journalPage } from "./documents/journalPage";
 import { branchesPage } from "./documents/branchesPage";
 import { privateLandingPage } from "./documents/privateLandingPage";
 import { newFrontiersLead } from "./documents/newFrontiersLead";
+import { lendingApplication } from "./documents/lendingApplication";
+import { lendingSettings } from "./documents/lendingSettings";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -61,6 +63,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     menuItem,
     privateLandingPage,
     newFrontiersLead,
+    lendingApplication,
+    lendingSettings,
     // Reusable objects
     seo,
     ctaLink,
