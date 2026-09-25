@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
@@ -26,7 +27,7 @@ export async function OurStory() {
           <p className="mt-4 text-base text-muted-foreground text-pretty sm:text-lg">
             {homeTeaser.description}
           </p>
-          <Button variant="outline" render={<a href="/our-story" />} className="mt-6">
+          <Button variant="outline" render={<Link href="/our-story" />} className="mt-6">
             Read Our Full Story
             <ArrowRight className="size-4" />
           </Button>

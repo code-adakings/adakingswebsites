@@ -30,6 +30,7 @@ import { communityImpact } from "./documents/communityImpact";
 import { whyAdakings } from "./documents/whyAdakings";
 import { journalPage } from "./documents/journalPage";
 import { branchesPage } from "./documents/branchesPage";
+import { privateLandingPage } from "./documents/privateLandingPage";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -57,6 +58,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     leadership,
     menuCategory,
     menuItem,
+    privateLandingPage,
     // Reusable objects
     seo,
     ctaLink,

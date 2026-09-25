@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Building2, Clock, Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Navigation, Phone, Twitter } from "lucide-react";
 import { PageHero } from "@/components/ui/page-hero";
 import { Container } from "@/components/ui/container";
@@ -154,9 +155,9 @@ export default async function ContactPage() {
               <MapPin className="mt-0.5 size-5 text-primary" />
               <div>
                 <p className="font-medium">{branchesBlock.heading}</p>
-                <a href="/branches" className="text-sm text-muted-foreground hover:text-foreground">
+                <Link href="/branches" className="text-sm text-muted-foreground hover:text-foreground">
                   {branchesBlock.linkLabel}
-                </a>
+                </Link>
               </div>
             </div>
 

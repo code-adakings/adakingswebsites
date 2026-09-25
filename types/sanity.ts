@@ -355,6 +355,84 @@ export type PhoneNumber = {
   number: string;
 };
 
+export type PrivateLandingMetric = {
+  value: string;
+  label: string;
+};
+
+export type PrivateLandingFeature = {
+  icon: string;
+  title: string;
+  description?: string;
+};
+
+export type PrivateLandingPhase = {
+  label: string;
+  amount: string;
+  description?: string;
+  status?: string;
+  isCurrent?: boolean;
+};
+
+export type PrivateLandingRepaymentRow = {
+  investment: string;
+  interest: string;
+  total: string;
+};
+
+export type SanityPrivateLandingPage = {
+  hero?: {
+    eyebrow?: string;
+    heading?: string;
+    subheading?: string;
+    description?: string;
+    primaryCtaLabel?: string;
+    secondaryCtaLabel?: string;
+    heroImage?: SanityImage;
+    metrics?: PrivateLandingMetric[];
+  };
+  foundersLetter?: {
+    eyebrow?: string;
+    heading?: string;
+    paragraphs?: string[];
+    signatureName?: string;
+    signatureRole?: string;
+  };
+  whyNow?: {
+    heading?: string;
+    body?: string[];
+    features?: PrivateLandingFeature[];
+  };
+  businessToday?: {
+    heading?: string;
+    body?: string;
+    serviceAreas?: string[];
+    metrics?: PrivateLandingMetric[];
+  };
+  roadmap?: {
+    heading?: string;
+    phases?: PrivateLandingPhase[];
+    caption?: string;
+  };
+  investmentTerms?: {
+    eyebrow?: string;
+    heading?: string;
+    headlineRate?: string;
+    rateCaption?: string;
+    repaymentRows?: PrivateLandingRepaymentRow[];
+    note?: string;
+  };
+  cta?: {
+    heading?: string;
+    body?: string;
+    investmentAmountOptions?: string[];
+    acknowledgementText?: string;
+    submitLabel?: string;
+    disclaimer?: string;
+  };
+  seo?: Seo;
+};
+
 export type SanitySiteSettings = {
   siteName: string;
   legalName?: string;

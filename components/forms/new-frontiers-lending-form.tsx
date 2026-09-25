@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "cn";
 import { trackEvent } from "@/lib/analytics";
 
-const INVESTMENT_AMOUNTS = [
+const DEFAULT_INVESTMENT_AMOUNTS = [
   "GHS 1,000",
   "GHS 2,500",
   "GHS 5,000",
@@ -16,6 +16,11 @@ const INVESTMENT_AMOUNTS = [
   "GHS 20,000",
   "GHS 50,000+",
 ];
+
+const DEFAULT_ACKNOWLEDGEMENT_TEXT =
+  "I understand this is a private lending facility and not an equity investment.";
+
+const DEFAULT_SUBMIT_LABEL = "Request Lending Agreement";
 
 type LendingFormPayload = {
   fullName: string;
@@ -26,7 +31,15 @@ type LendingFormPayload = {
   acknowledged: boolean;
 };
 
-export function NewFrontiersLendingForm() {
+export function NewFrontiersLendingForm({
+  investmentAmountOptions = DEFAULT_INVESTMENT_AMOUNTS,
+  acknowledgementText = DEFAULT_ACKNOWLEDGEMENT_TEXT,
+  submitLabel = DEFAULT_SUBMIT_LABEL,
+}: {
+  investmentAmountOptions?: string[];
+  acknowledgementText?: string;
+  submitLabel?: string;
+}) {
   const [submitted, setSubmitted] = React.useState(false);
   const [agreed, setAgreed] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -126,7 +139,7 @@ export function NewFrontiersLendingForm() {
           <option value="" disabled>
             Select an amount
           </option>
-          {INVESTMENT_AMOUNTS.map((amount) => (
+          {investmentAmountOptions.map((amount) => (
             <option key={amount} value={amount}>
               {amount}
             </option>
@@ -157,9 +170,7 @@ export function NewFrontiersLendingForm() {
           onChange={(event) => setAgreed(event.target.checked)}
           className="mt-0.5 size-4 shrink-0 rounded border-white/30 bg-white/10 text-primary focus-visible:ring-3 focus-visible:ring-ring/50"
         />
-        <span>
-          I understand this is a private lending facility and not an equity investment.
-        </span>
+        <span>{acknowledgementText}</span>
       </label>
 
       <Button
@@ -167,7 +178,7 @@ export function NewFrontiersLendingForm() {
         disabled={!agreed || isSubmitting}
         className="h-11 w-full bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark"
       >
-        {isSubmitting ? "Submitting…" : "Request Lending Agreement"}
+        {isSubmitting ? "Submitting…" : submitLabel}
       </Button>
     </form>
   );

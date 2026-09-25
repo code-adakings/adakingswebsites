@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MapPin, ArrowRight, Bike, ShoppingBag } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
@@ -30,7 +31,7 @@ export async function BranchesPreview({
       <Container>
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <SectionHeading eyebrow={eyebrow} title={title} description={description} />
-          <Button variant="outline" render={<a href="/branches" />} className="hidden shrink-0 sm:inline-flex">
+          <Button variant="outline" render={<Link href="/branches" />} className="hidden shrink-0 sm:inline-flex">
             View All Branches
           </Button>
         </div>
@@ -81,7 +82,7 @@ export async function BranchesPreview({
               </p>
               <Button
                 variant="outline"
-                render={<a href="/branches" />}
+                render={<Link href="/branches" />}
                 className="mt-4 w-fit"
               >
                 View Branch
@@ -90,7 +91,7 @@ export async function BranchesPreview({
           ))}
         </div>
 
-        <Button variant="outline" render={<a href="/branches" />} className="mt-8 w-full sm:hidden">
+        <Button variant="outline" render={<Link href="/branches" />} className="mt-8 w-full sm:hidden">
           View All Branches
           <ArrowRight className="size-4" />
         </Button>

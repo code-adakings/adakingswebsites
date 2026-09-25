@@ -20,6 +20,7 @@ import {
   TagsIcon,
   BasketIcon,
   CommentIcon,
+  LockIcon,
 } from "@sanity/icons";
 import type { StructureResolver } from "sanity/structure";
 import { singletonTypes } from "./schemaTypes";
@@ -48,6 +49,7 @@ const explicitCollectionTypes = new Set([
   "leadership",
   "menuCategory",
   "menuItem",
+  "privateLandingPage",
 ]);
 
 export const structure: StructureResolver = (S) =>
@@ -124,6 +126,10 @@ export const structure: StructureResolver = (S) =>
             ]),
         ),
       S.documentTypeListItem("leadership").title("Leadership").icon(UsersIcon),
+      S.divider(),
+      S.documentTypeListItem("privateLandingPage")
+        .title("Private Landing Pages")
+        .icon(LockIcon),
       S.divider(),
       singleton(S, "siteSettings", "Settings", CogIcon),
       // Safety net: surfaces any future document type that hasn't been

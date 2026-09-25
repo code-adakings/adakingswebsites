@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,7 @@ export async function SignatureMeals() {
           />
           <Button
             variant="outline"
-            render={<a href="/menu" />}
+            render={<Link href="/menu" />}
             className="hidden shrink-0 sm:inline-flex"
           >
             View Full Menu
@@ -58,7 +59,7 @@ export async function SignatureMeals() {
           ))}
         </div>
 
-        <Button variant="outline" render={<a href="/menu" />} className="mt-8 w-full sm:hidden">
+        <Button variant="outline" render={<Link href="/menu" />} className="mt-8 w-full sm:hidden">
           View Full Menu
         </Button>
       </Container>

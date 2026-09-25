@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight, MapPin, Briefcase } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
@@ -19,7 +20,7 @@ export async function Careers() {
             title={homeCta.heading ?? ""}
             description={homeCta.description}
           />
-          <Button variant="outline" render={<a href="/careers" />} className="hidden shrink-0 sm:inline-flex">
+          <Button variant="outline" render={<Link href="/careers" />} className="hidden shrink-0 sm:inline-flex">
             View All Roles
           </Button>
         </div>
@@ -60,7 +61,7 @@ export async function Careers() {
           </p>
         )}
 
-        <Button variant="outline" render={<a href="/careers" />} className="mt-8 w-full sm:hidden">
+        <Button variant="outline" render={<Link href="/careers" />} className="mt-8 w-full sm:hidden">
           View All Roles
         </Button>
       </Container>

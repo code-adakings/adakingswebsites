@@ -388,3 +388,39 @@ export const founderQuery = defineQuery(`
     socialLinks,
   }
 `);
+
+export const privateLandingPageBySlugQuery = defineQuery(`
+  *[_type == "privateLandingPage" && slug.current == $slug][0]{
+    hero{
+      eyebrow,
+      heading,
+      subheading,
+      description,
+      primaryCtaLabel,
+      secondaryCtaLabel,
+      heroImage${imageFields},
+      metrics[]{ value, label },
+    },
+    foundersLetter{ eyebrow, heading, paragraphs, signatureName, signatureRole },
+    whyNow{ heading, body, features[]{ icon, title, description } },
+    businessToday{ heading, body, serviceAreas, metrics[]{ value, label } },
+    roadmap{ heading, phases[]{ label, amount, description, status, isCurrent }, caption },
+    investmentTerms{
+      eyebrow,
+      heading,
+      headlineRate,
+      rateCaption,
+      repaymentRows[]{ investment, interest, total },
+      note,
+    },
+    cta{
+      heading,
+      body,
+      investmentAmountOptions,
+      acknowledgementText,
+      submitLabel,
+      disclaimer,
+    },
+    seo${seoFields},
+  }
+`);
