@@ -4,10 +4,25 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { PlaceholderImage } from "@/components/ui/placeholder-image";
-import { siteConfig } from "@/lib/site-config";
+import { SanityImage } from "@/components/ui/sanity-image";
+import { trackEvent } from "@/lib/analytics";
+import type { CtaLink, SanityImage as SanityImageValue } from "@/types/sanity";
 
-export function Hero() {
+export function Hero({
+  eyebrow,
+  heading,
+  subheading,
+  backgroundImage,
+  primaryCta,
+  secondaryCta,
+}: {
+  eyebrow?: string;
+  heading: string;
+  subheading?: string;
+  backgroundImage?: SanityImageValue;
+  primaryCta?: CtaLink;
+  secondaryCta?: CtaLink;
+}) {
   return (
     <section className="relative overflow-hidden bg-brand-black text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,color-mix(in_oklch,var(--color-brand-red)_35%,transparent),transparent_55%)]" />
@@ -17,33 +32,39 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium tracking-wide text-brand-gold uppercase">
-            Proudly Ghanaian &middot; Black-owned
-          </span>
+          {eyebrow ? (
+            <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium tracking-wide text-brand-gold uppercase">
+              {eyebrow}
+            </span>
+          ) : null}
           <h1 className="mt-6 text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl">
-            Fast food, made with pride.
+            {heading}
           </h1>
-          <p className="mt-6 max-w-lg text-lg text-white/70 text-pretty">
-            Adakings brings bold Ghanaian flavor to every plate — crafted fresh,
-            served fast, and rooted in the communities we call home.
-          </p>
+          {subheading ? (
+            <p className="mt-6 max-w-lg text-lg text-white/70 text-pretty">{subheading}</p>
+          ) : null}
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Button
-              size="lg"
-              render={<a href={siteConfig.orderUrl} target="_blank" rel="noopener noreferrer" />}
-              className="h-11 bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark"
-            >
-              Order Food
-              <ArrowRight className="size-4" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              render={<a href="/branches" />}
-              className="h-11 border-white/20 bg-transparent px-6 text-base text-white hover:bg-white/10 hover:text-white"
-            >
-              Find a Branch
-            </Button>
+            {primaryCta ? (
+              <Button
+                size="lg"
+                render={<a href={primaryCta.href} target="_blank" rel="noopener noreferrer" />}
+                onClick={() => trackEvent("order_click", { location: "hero" })}
+                className="h-11 bg-primary px-6 text-base text-primary-foreground hover:bg-brand-red-dark"
+              >
+                {primaryCta.label}
+                <ArrowRight className="size-4" />
+              </Button>
+            ) : null}
+            {secondaryCta ? (
+              <Button
+                size="lg"
+                variant="outline"
+                render={<a href={secondaryCta.href} />}
+                className="h-11 border-white/20 bg-transparent px-6 text-base text-white hover:bg-white/10 hover:text-white"
+              >
+                {secondaryCta.label}
+              </Button>
+            ) : null}
           </div>
         </motion.div>
 
@@ -52,9 +73,12 @@ export function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
         >
-          <PlaceholderImage
-            label="Signature meal — hero photography"
+          <SanityImage
+            image={backgroundImage}
+            fallbackLabel="Signature meal — hero photography"
             className="aspect-4/5 w-full lg:aspect-square"
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            priority
           />
         </motion.div>
       </Container>

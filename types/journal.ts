@@ -1,21 +1,5 @@
-export type JournalCategory =
-  | "Company News"
-  | "Culture & Community"
-  | "Franchise"
-  | "Recipes & Craft"
-  | "Careers";
+import type { SanityJournalPost } from "./sanity";
 
-export type JournalFrontmatter = {
-  title: string;
-  excerpt: string;
-  category: JournalCategory;
-  authorId: string;
-  publishedAt: string;
-  coverImage: string;
-  featured?: boolean;
-};
-
-export type JournalPost = JournalFrontmatter & {
-  slug: string;
+export type JournalPost = Omit<SanityJournalPost, "readingTimeOverride" | "relatedPosts"> & {
   readingTime: string;
 };

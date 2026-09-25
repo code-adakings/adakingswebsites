@@ -14,9 +14,16 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/layout/logo";
-import { mainNav, siteConfig } from "@/lib/site-config";
+import { trackEvent } from "@/lib/analytics";
+import type { NavItem } from "@/lib/site-config";
 
-export function Navbar() {
+export function Navbar({
+  nav,
+  orderUrl,
+}: {
+  nav: NavItem[];
+  orderUrl: string;
+}) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -41,7 +48,7 @@ export function Navbar() {
         <Logo />
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {mainNav.map((item) => {
+          {nav.map((item) => {
             const active =
               item.href === "/"
                 ? pathname === "/"
@@ -66,8 +73,9 @@ export function Navbar() {
         <div className="hidden items-center gap-3 lg:flex">
           <Button
             render={
-              <a href={siteConfig.orderUrl} target="_blank" rel="noopener noreferrer" />
+              <a href={orderUrl} target="_blank" rel="noopener noreferrer" />
             }
+            onClick={() => trackEvent("order_click", { location: "navbar" })}
             className="bg-primary text-primary-foreground hover:bg-brand-red-dark"
           >
             Order Food
@@ -91,7 +99,7 @@ export function Navbar() {
               </SheetTitle>
             </SheetHeader>
             <nav className="flex flex-col gap-1 px-4">
-              {mainNav.map((item) => {
+              {nav.map((item) => {
                 const active =
                   item.href === "/"
                     ? pathname === "/"
@@ -116,8 +124,9 @@ export function Navbar() {
             <div className="mt-auto p-4">
               <Button
                 render={
-                  <a href={siteConfig.orderUrl} target="_blank" rel="noopener noreferrer" />
+                  <a href={orderUrl} target="_blank" rel="noopener noreferrer" />
                 }
+                onClick={() => trackEvent("order_click", { location: "navbar_mobile" })}
                 className="w-full bg-primary text-primary-foreground hover:bg-brand-red-dark"
               >
                 Order Food

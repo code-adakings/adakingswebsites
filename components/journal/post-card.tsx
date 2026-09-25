@@ -1,17 +1,16 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { PlaceholderImage } from "@/components/ui/placeholder-image";
-import { getAuthor } from "@/lib/authors";
+import { SanityImage } from "@/components/ui/sanity-image";
 import type { JournalPost } from "@/types/journal";
 
 export function PostCard({ post }: { post: JournalPost }) {
-  const author = getAuthor(post.authorId);
+  const author = post.author;
   return (
     <Link href={`/journal/${post.slug}`} className="group block">
-      <PlaceholderImage label={post.title} className="aspect-4/3" />
+      <SanityImage image={post.heroImage} fallbackLabel={post.title} className="aspect-4/3" />
       <div className="mt-4">
         <Badge variant="secondary" className="bg-muted text-foreground/70">
-          {post.category}
+          {post.categories[0]?.title}
         </Badge>
         <h3 className="mt-3 text-lg font-semibold transition-colors group-hover:text-primary">
           {post.title}

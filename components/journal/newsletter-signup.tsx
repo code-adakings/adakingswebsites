@@ -4,7 +4,13 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function NewsletterSignup() {
+export function NewsletterSignup({
+  heading = "Stay in the loop",
+  description = "Get new stories from the Adakings Journal — company news, culture, and recipes — straight to your inbox.",
+}: {
+  heading?: string;
+  description?: string;
+}) {
   const [email, setEmail] = React.useState("");
   const [submitted, setSubmitted] = React.useState(false);
 
@@ -16,11 +22,10 @@ export function NewsletterSignup() {
   return (
     <div className="rounded-3xl bg-brand-black p-8 text-white sm:p-10">
       <h3 className="text-xl font-bold tracking-tight sm:text-2xl">
-        Stay in the loop
+        {heading}
       </h3>
       <p className="mt-2 max-w-md text-sm text-white/70">
-        Get new stories from the Adakings Journal — company news, culture, and
-        recipes — straight to your inbox.
+        {description}
       </p>
       {submitted ? (
         <p className="mt-6 text-sm font-medium text-brand-gold">

@@ -1,25 +1,19 @@
-// Placeholder content — replace with real, sourced customer testimonials
-// (name, branch, and quote) before this section goes live.
-export type Testimonial = {
-  quote: string;
-  name: string;
-  detail: string;
-};
+import { sanityFetch } from "@/sanity/lib/fetch";
+import { allTestimonialsQuery, featuredTestimonialsQuery } from "@/sanity/lib/queries";
+import type { SanityTestimonial } from "@/types/sanity";
 
-export const testimonials: Testimonial[] = [
-  {
-    quote: "Placeholder testimonial — swap in a real customer quote before launch.",
-    name: "Customer Name",
-    detail: "Placeholder · Branch",
-  },
-  {
-    quote: "Placeholder testimonial — swap in a real customer quote before launch.",
-    name: "Customer Name",
-    detail: "Placeholder · Branch",
-  },
-  {
-    quote: "Placeholder testimonial — swap in a real customer quote before launch.",
-    name: "Customer Name",
-    detail: "Placeholder · Branch",
-  },
-];
+const TESTIMONIAL_TAG = "testimonial";
+
+export async function getFeaturedTestimonials(limit = 3): Promise<SanityTestimonial[]> {
+  const featured = await sanityFetch<SanityTestimonial[]>({
+    query: featuredTestimonialsQuery,
+    tags: [TESTIMONIAL_TAG],
+  });
+  if (featured.length > 0) return featured.slice(0, limit);
+
+  const all = await sanityFetch<SanityTestimonial[]>({
+    query: allTestimonialsQuery,
+    tags: [TESTIMONIAL_TAG],
+  });
+  return all.slice(0, limit);
+}

@@ -14,8 +14,12 @@ export const siteConfig = {
   },
   contact: {
     email: "hello@adakings.com",
+    supportEmail: "support@adakings.com",
     phone: "+233 000 000 000",
+    whatsapp: "+233000000000",
   },
+  registeredAddress: "",
+  googleMapsUrl: "",
 } as const;
 
 export type NavItem = {

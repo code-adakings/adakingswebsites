@@ -1,24 +1,36 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Facebook, Instagram, Linkedin, MessageCircle, Twitter } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Separator } from "@/components/ui/separator";
-import { footerNav, siteConfig } from "@/lib/site-config";
+import type { ResolvedSiteSettings } from "@/lib/site-settings";
 
-const socialLinks = [
-  { label: "Instagram", href: siteConfig.social.instagram, icon: Instagram },
-  { label: "Facebook", href: siteConfig.social.facebook, icon: Facebook },
-  { label: "Twitter", href: siteConfig.social.twitter, icon: Twitter },
-  { label: "LinkedIn", href: siteConfig.social.linkedin, icon: Linkedin },
-];
+export function Footer({
+  siteName,
+  footerNav,
+  description,
+  legalName,
+  social,
+  contactEmail,
+  contactPhone,
+  whatsapp,
+}: Pick<
+  ResolvedSiteSettings,
+  "siteName" | "footerNav" | "description" | "legalName" | "social" | "contactEmail" | "contactPhone" | "whatsapp"
+>) {
+  const socialLinks = [
+    { label: "Instagram", href: social.instagram, icon: Instagram },
+    { label: "Facebook", href: social.facebook, icon: Facebook },
+    { label: "Twitter", href: social.twitter, icon: Twitter },
+    { label: "LinkedIn", href: social.linkedin, icon: Linkedin },
+  ].filter((link): link is typeof link & { href: string } => Boolean(link.href));
 
-export function Footer() {
   return (
     <footer className="bg-brand-black text-white">
       <Container className="py-16">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
-            <Link href="/" aria-label="Adakings home" className="inline-flex items-center gap-2.5">
+            <Link href="/" aria-label={`${siteName} home`} className="inline-flex items-center gap-2.5">
               <Image
                 src="/brand/adakings-logo-icon.png"
                 alt=""
@@ -27,11 +39,11 @@ export function Footer() {
                 className="h-8 w-8"
               />
               <span className="text-lg font-bold tracking-tight text-white">
-                Adakings
+                {siteName}
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-white/60">
-              {siteConfig.description}
+              {description}
             </p>
             <div className="mt-6 flex items-center gap-3">
               {socialLinks.map(({ label, href, icon: Icon }) => (
@@ -72,20 +84,33 @@ export function Footer() {
             <ul className="mt-4 space-y-3 text-sm text-white/60">
               <li>
                 <a
-                  href={`mailto:${siteConfig.contact.email}`}
+                  href={`mailto:${contactEmail}`}
                   className="transition-colors hover:text-white"
                 >
-                  {siteConfig.contact.email}
+                  {contactEmail}
                 </a>
               </li>
               <li>
                 <a
-                  href={`tel:${siteConfig.contact.phone.replace(/\s+/g, "")}`}
+                  href={`tel:${contactPhone.replace(/\s+/g, "")}`}
                   className="transition-colors hover:text-white"
                 >
-                  {siteConfig.contact.phone}
+                  {contactPhone}
                 </a>
               </li>
+              {whatsapp ? (
+                <li>
+                  <a
+                    href={`https://wa.me/${whatsapp.replace(/[^\d]/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 transition-colors hover:text-white"
+                  >
+                    <MessageCircle className="size-3.5" />
+                    WhatsApp
+                  </a>
+                </li>
+              ) : null}
             </ul>
           </div>
         </div>
@@ -94,7 +119,7 @@ export function Footer() {
 
         <div className="flex flex-col-reverse items-center justify-between gap-4 sm:flex-row">
           <p className="text-xs text-white/50">
-            &copy; {new Date().getFullYear()} {siteConfig.legalName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {legalName}. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-xs text-white/50">
             <Link href="/privacy" className="transition-colors hover:text-white">

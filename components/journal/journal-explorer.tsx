@@ -23,7 +23,8 @@ export function JournalExplorer({
       query.trim().length === 0 ||
       post.title.toLowerCase().includes(query.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(query.toLowerCase());
-    const matchesCategory = !activeCategory || post.category === activeCategory;
+    const matchesCategory =
+      !activeCategory || post.categories.some((category) => category.title === activeCategory);
     return matchesQuery && matchesCategory;
   });
 

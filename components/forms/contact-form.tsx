@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/lib/site-config";
 
-export function ContactForm() {
+export function ContactForm({
+  contactEmail = siteConfig.contact.email,
+}: {
+  contactEmail?: string;
+}) {
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [message, setMessage] = React.useState("");
@@ -15,7 +19,7 @@ export function ContactForm() {
     event.preventDefault();
     const subject = encodeURIComponent(`Website inquiry from ${name || "a visitor"}`);
     const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
-    window.location.href = `mailto:${siteConfig.contact.email}?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${contactEmail}?subject=${subject}&body=${body}`;
   }
 
   return (
@@ -64,7 +68,7 @@ export function ContactForm() {
         Send Message
       </Button>
       <p className="text-xs text-muted-foreground">
-        This opens your email app with your message pre-filled to {siteConfig.contact.email}.
+        This opens your email app with your message pre-filled to {contactEmail}.
       </p>
     </form>
   );

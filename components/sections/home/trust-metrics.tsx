@@ -1,13 +1,6 @@
 import { Container } from "@/components/ui/container";
 
-const metrics = [
-  { value: "200,000+", label: "Meals Sold" },
-  { value: "10+", label: "Branches Across Ghana" },
-  { value: "500+", label: "Team Members" },
-  { value: "4.8/5", label: "Average Customer Rating" },
-];
-
-export function TrustMetrics() {
+export function TrustMetrics({ metrics }: { metrics: { value: string; label: string }[] }) {
   return (
     <section className="border-y border-border bg-muted/40">
       <Container className="grid grid-cols-2 gap-8 py-12 sm:grid-cols-4">
