@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   // Rendered server-side for the lending agreement PDF; its font/layout
   // engines don't survive bundling, so load it from node_modules as-is.
   serverExternalPackages: ["@react-pdf/renderer"],
+  // pdfkit loads its built-in fonts (Helvetica, Times…) through a dynamic
+  // `require("#standard-fonts/*")` the file tracer can't follow. Without this
+  // they're missing on Vercel and the PDF route 500s with an empty body.
+  outputFileTracingIncludes: {
+    "/new-frontiers/d/*/pdf": ["./node_modules/pdfkit/js/standard-fonts/**/*"],
+  },
   images: {
     remotePatterns: [
       {
