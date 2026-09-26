@@ -9,6 +9,7 @@ import {
   type LendingEmailKind,
 } from "@/lib/lending/shared";
 import {
+  enteredCurrentStatusAt,
   getApplicationById,
   lendingUrl,
   recordNotification,
@@ -96,7 +97,7 @@ const TEMPLATES: Record<LendingEmailKind | "received" | "signed", (app: LendingA
     heading: "Your provisional agreement is ready",
     paragraphs: [
       `${firstName(app)}, thank you for discussing terms with us. Your provisional lending agreement has been prepared with the terms below.`,
-      "Please read it carefully. We'll send payment instructions separately once you're ready to proceed.",
+      "Please read it carefully. When you're ready to fund it, select \"Proceed to payment\" on your agreement page to see our bank and Mobile Money details.",
     ],
     rows: termRows(app),
     cta: "Review your agreement",
@@ -106,11 +107,12 @@ const TEMPLATES: Record<LendingEmailKind | "received" | "signed", (app: LendingA
     heading: "Payment instructions",
     paragraphs: [
       "Your agreement page now shows our bank and Mobile Money details.",
-      `Please use your exact payment reference, ${app.agreementNumber}, so we can match your transfer to your agreement.`,
+      `Please use your exact payment reference, ${app.paymentReference ?? app.agreementNumber}, so we can match your transfer to your agreement.`,
+      "Our finance team verifies every transfer against our bank or Mobile Money statement before your final agreement is activated.",
     ],
     rows: [
       ["Amount due", formatCedis(app.negotiatedAmount)],
-      ["Payment reference", app.agreementNumber ?? "—"],
+      ["Payment reference", app.paymentReference ?? app.agreementNumber ?? "—"],
     ],
     cta: "View payment details",
   }),
@@ -119,7 +121,7 @@ const TEMPLATES: Record<LendingEmailKind | "received" | "signed", (app: LendingA
     heading: "Payment confirmed",
     paragraphs: [
       `We've received your payment of ${formatCedis(app.negotiatedAmount)}. Your agreement is now verified and active.`,
-      "The final step is to sign it digitally. Once signed, you can download your executed agreement as a PDF.",
+      "The final step is to give your digital consent. Once you select \"I Agree\", you can download your executed agreement as a PDF.",
     ],
     rows: termRows(app),
     cta: "Sign & download final agreement",
@@ -194,7 +196,10 @@ export async function sendEmailForCurrentStatus(
 
   const kind = EMAIL_FOR_STATUS[app.status];
   if (!kind) return { skipped: "no email for this status" };
-  if (app.notifications?.some((n) => n.kind === kind)) return { skipped: "already sent" };
+  // Once per entry into the status — so after an admin override moves an
+  // application back, re-approving it emails the lender the new terms.
+  const since = enteredCurrentStatusAt(app);
+  if (app.notifications?.some((n) => n.kind === kind && n.sentAt >= since)) return { skipped: "already sent" };
 
   await sendToLender(kind, app);
   await recordNotification(app, kind);

@@ -20,10 +20,11 @@ type Row = {
   negotiatedAmount?: number;
   agreementNumber?: string;
   appliedAt?: string;
+  consentAt?: string;
 };
 
 const QUERY = `*[_type == "lendingApplication" && !(_id in path("drafts.**"))] | order(appliedAt desc) {
-  _id, fullName, status, requestedAmount, negotiatedAmount, agreementNumber, appliedAt
+  _id, fullName, status, requestedAmount, negotiatedAmount, agreementNumber, appliedAt, consentAt
 }`;
 
 function Pipeline() {
@@ -61,7 +62,10 @@ function Pipeline() {
         <Flex align="flex-end" justify="space-between" wrap="wrap" gap={3}>
           <Stack space={3}>
             <Heading size={3}>Operation New Frontiers</Heading>
-            <Text muted>Lending pipeline. Open an application to move it forward.</Text>
+            <Text muted>
+              Lending pipeline. Finance only needs three actions: Approve Terms, Confirm Payment (after checking our
+              own statement), and Mark Completed.
+            </Text>
           </Stack>
           <Card padding={3} radius={2} tone="positive" border>
             <Text size={1} muted>
@@ -108,6 +112,11 @@ function Pipeline() {
                             {[
                               row.negotiatedAmount != null ? formatCedis(row.negotiatedAmount) : row.requestedAmount,
                               row.agreementNumber ?? formatDate(row.appliedAt),
+                              row.status === "PAYMENT_RECEIVED"
+                                ? row.consentAt
+                                  ? "Consented — ready to complete"
+                                  : "Awaiting consent"
+                                : null,
                             ]
                               .filter(Boolean)
                               .join(" · ")}

@@ -1,17 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getApplicationByToken, getLendingSettings } from "@/lib/lending/server";
 import { renderAgreementPdf } from "@/lib/lending/pdf";
-import { isAtLeast } from "@/lib/lending/shared";
+import { isExecuted } from "@/lib/lending/shared";
 
 export const dynamic = "force-dynamic";
 
-/** The executed agreement PDF — only exists once the lender has signed. */
+/**
+ * The executed agreement PDF. Generated on demand, and only once finance has
+ * confirmed the payment AND the lender has given digital consent.
+ */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const app = await getApplicationByToken(token);
   if (!app) return new NextResponse("Not found", { status: 404 });
 
-  if (!isAtLeast(app.status, "CONSENT_SIGNED")) {
+  if (!isExecuted(app)) {
     return NextResponse.redirect(new URL(`/new-frontiers/d/${token}`, req.url));
   }
 

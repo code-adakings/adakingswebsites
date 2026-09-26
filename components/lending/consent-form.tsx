@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import { useActionState } from "react";
-import { PenLine } from "lucide-react";
+import { ArrowRight, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { signLendingAgreement, type LendingConsentState } from "@/lib/actions/lending-consent";
+import { proceedToPayment, signLendingAgreement, type LendingConsentState } from "@/lib/actions/lending-consent";
+import { CONSENT_STATEMENT, CONSENT_VERSION } from "@/lib/lending/shared";
 
 export function LendingConsentForm({ token, lenderName }: { token: string; lenderName: string }) {
   const [state, formAction, isPending] = useActionState<LendingConsentState, FormData>(
@@ -27,14 +28,14 @@ export function LendingConsentForm({ token, lenderName }: { token: string; lende
           className="mt-0.5 size-4 shrink-0 rounded border-border accent-primary"
         />
         <span>
-          I have read and agree to the terms of this Lending Agreement. I understand this constitutes my
-          electronic signature.
+          {CONSENT_STATEMENT}
+          <span className="mt-1 block text-xs text-muted-foreground">Consent version {CONSENT_VERSION}</span>
         </span>
       </label>
 
       <div className="space-y-2">
         <label htmlFor="signatureName" className="text-sm font-medium">
-          Type your full name to sign
+          Type your full name
         </label>
         <Input
           id="signatureName"
@@ -45,6 +46,9 @@ export function LendingConsentForm({ token, lenderName }: { token: string; lende
           onChange={(event) => setName(event.target.value)}
           className="h-11 font-serif text-lg italic"
         />
+        <p className="text-xs text-muted-foreground">
+          We record your name, IP address, device and the time (UTC) with your consent.
+        </p>
       </div>
 
       {state.error ? (
@@ -55,8 +59,29 @@ export function LendingConsentForm({ token, lenderName }: { token: string; lende
 
       <Button type="submit" disabled={!agreed || !name.trim() || isPending} className="h-11 w-full text-base sm:w-auto sm:px-8">
         <PenLine className="size-4" />
-        {isPending ? "Signing…" : "Sign Agreement"}
+        {isPending ? "Recording…" : "I Agree"}
       </Button>
+    </form>
+  );
+}
+
+export function ProceedToPaymentForm({ token }: { token: string }) {
+  const [state, formAction, isPending] = useActionState<LendingConsentState, FormData>(
+    proceedToPayment.bind(null, token),
+    {},
+  );
+
+  return (
+    <form action={formAction} className="space-y-3">
+      <Button type="submit" size="lg" disabled={isPending} className="h-11 w-full px-6 text-base sm:w-auto">
+        {isPending ? "Loading…" : "Proceed to payment"}
+        <ArrowRight className="size-4" />
+      </Button>
+      {state.error ? (
+        <p role="alert" className="text-sm font-medium text-destructive">
+          {state.error}
+        </p>
+      ) : null}
     </form>
   );
 }

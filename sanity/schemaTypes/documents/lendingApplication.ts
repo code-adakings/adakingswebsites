@@ -1,6 +1,7 @@
 import { defineArrayMember, defineField, defineType, type ConditionalPropertyCallbackContext } from "sanity";
 import { DocumentTextIcon } from "@sanity/icons";
 import {
+  INTEREST_RATE_RANGE,
   STATUS_LABELS,
   STATUS_OPTIONS,
   formatCedis,
@@ -50,7 +51,7 @@ export const lendingApplication = defineType({
       initialValue: "APPLIED",
       readOnly: true,
       description:
-        "Moves one step at a time using the action buttons at the bottom of this document — it can't be edited directly.",
+        "Forward-only. Opening a new application starts the review; after that, finance uses Approve Terms → Confirm Payment → Mark Completed at the bottom of this document. Only an administrator can move it back.",
       group: ["deal", "applicant"],
     }),
     defineField({
@@ -58,7 +59,16 @@ export const lendingApplication = defineType({
       title: "Agreement number",
       type: "string",
       readOnly: true,
-      description: "Assigned automatically on approval. Also the lender's payment reference.",
+      description: "Assigned automatically on approval (ONF-YYYY-NNNN) — the public reference for this agreement.",
+      group: "deal",
+    }),
+    defineField({
+      name: "verificationCode",
+      title: "Verification code",
+      type: "string",
+      readOnly: true,
+      hidden: ({ value }) => !value,
+      description: "Printed on the PDF with its QR code; together with the agreement number it lets anyone verify the agreement.",
       group: "deal",
     }),
 
@@ -75,15 +85,22 @@ export const lendingApplication = defineType({
       name: "interestRate",
       title: "Interest rate (%)",
       type: "number",
-      description: "Fixed return for the full term, e.g. 17.5.",
+      description: `Fixed return for the full term, typically ${INTEREST_RATE_RANGE.min}–${INTEREST_RATE_RANGE.max}.`,
       readOnly: lockedFrom("APPROVED"),
-      validation: (rule) => rule.min(0).max(100),
+      validation: (rule) => [
+        rule.min(0).max(100),
+        rule
+          .min(INTEREST_RATE_RANGE.min)
+          .max(INTEREST_RATE_RANGE.max)
+          .warning(`Outside the usual ${INTEREST_RATE_RANGE.min}%–${INTEREST_RATE_RANGE.max}% range — double-check before approving.`),
+      ],
       group: "deal",
     }),
     defineField({
       name: "termMonths",
       title: "Term (months)",
       type: "number",
+      initialValue: 4,
       readOnly: lockedFrom("APPROVED"),
       validation: (rule) => rule.integer().min(1),
       group: "deal",
@@ -106,11 +123,30 @@ export const lendingApplication = defineType({
       group: "deal",
     }),
     defineField({
+      name: "paymentReference",
+      title: "Payment reference",
+      type: "string",
+      description:
+        "The reference the lender must quote when paying. Defaults to the agreement number at approval; editable until payment is confirmed.",
+      readOnly: lockedFrom("PAYMENT_RECEIVED"),
+      hidden: hiddenBefore("APPROVED"),
+      group: "deal",
+    }),
+    defineField({
+      name: "fundedDate",
+      title: "Funding date",
+      type: "date",
+      description: "The date the funds landed in our account. Leave empty to use the day you confirm payment.",
+      readOnly: lockedFrom("PAYMENT_RECEIVED"),
+      hidden: hiddenBefore("PAYMENT_PENDING"),
+      group: "deal",
+    }),
+    defineField({
       name: "maturityDate",
       title: "Maturity date",
       type: "date",
       description:
-        "Leave empty to set it automatically to the term length after the payment is confirmed.",
+        "Leave empty to set it automatically to the funding date plus the term when payment is confirmed.",
       readOnly: lockedFrom("PAYMENT_RECEIVED"),
       group: "deal",
     }),
@@ -205,17 +241,43 @@ export const lendingApplication = defineType({
       group: "payment",
     }),
     defineField({
+      name: "transactionId",
+      title: "Bank / MoMo transaction ID",
+      type: "string",
+      description: "As it appears on our statement. Required to confirm payment.",
+      readOnly: editableOnlyAt("PAYMENT_PENDING"),
+      hidden: hiddenBefore("PAYMENT_PENDING"),
+      group: "payment",
+    }),
+    defineField({
+      name: "paymentVerified",
+      title: "I have matched this transaction against our bank / MoMo statement",
+      type: "boolean",
+      description:
+        "Never confirm from a lender's screenshot or receipt alone — the funds must be visible on our own statement.",
+      readOnly: editableOnlyAt("PAYMENT_PENDING"),
+      hidden: hiddenBefore("PAYMENT_PENDING"),
+      group: "payment",
+    }),
+    defineField({
+      name: "paymentVerifiedBy",
+      title: "Verified by",
+      type: "string",
+      readOnly: true,
+      hidden: ({ value }) => !value,
+      group: "payment",
+    }),
+    defineField({
       name: "paymentNotes",
       title: "Payment notes",
       type: "text",
       rows: 2,
-      description: "e.g. bank transaction ID or MoMo transaction ID.",
       readOnly: editableOnlyAt("PAYMENT_PENDING"),
       hidden: hiddenBefore("PAYMENT_PENDING"),
       group: "payment",
     }),
 
-    // Execution — written by the site when the lender signs.
+    // Execution — written by the site when the lender consents; permanent.
     defineField({
       name: "consentAccepted",
       title: "Consent accepted",
@@ -226,11 +288,52 @@ export const lendingApplication = defineType({
     defineField({ name: "consentName", title: "Name typed as signature", type: "string", readOnly: true, group: "execution" }),
     defineField({ name: "consentAt", title: "Consent timestamp", type: "datetime", readOnly: true, group: "execution" }),
     defineField({ name: "consentIp", title: "Consent IP address", type: "string", readOnly: true, group: "execution" }),
-    defineField({ name: "consentUserAgent", title: "Consent browser", type: "string", readOnly: true, group: "execution" }),
+    defineField({ name: "consentUserAgent", title: "Consent device / browser", type: "string", readOnly: true, group: "execution" }),
+    defineField({ name: "consentVersion", title: "Consent version", type: "string", readOnly: true, group: "execution" }),
+    defineField({ name: "consentStatement", title: "Consent statement agreed to", type: "text", rows: 3, readOnly: true, group: "execution" }),
+    defineField({
+      name: "agreementHash",
+      title: "Agreement fingerprint (SHA-256)",
+      type: "string",
+      readOnly: true,
+      description: "Fingerprint of the exact terms and wording consented to; the verification page checks it still matches.",
+      group: "execution",
+    }),
+    defineField({
+      name: "agreementSnapshot",
+      title: "Agreement wording (frozen at approval)",
+      type: "object",
+      readOnly: true,
+      hidden: ({ value }) => !value,
+      description: "Later edits to Lending Settings never change an approved agreement.",
+      group: "execution",
+      fields: [
+        defineField({ name: "borrowerCompany", title: "Borrower", type: "string" }),
+        defineField({ name: "borrowerSignatory", title: "Signatory", type: "string" }),
+        defineField({ name: "borrowerSignatoryTitle", title: "Signatory title", type: "string" }),
+        defineField({
+          name: "clauses",
+          title: "Clauses",
+          type: "array",
+          of: [
+            defineArrayMember({
+              type: "object",
+              name: "clause",
+              fields: [
+                defineField({ name: "heading", type: "string" }),
+                defineField({ name: "body", type: "text" }),
+              ],
+              preview: { select: { title: "heading", subtitle: "body" } },
+            }),
+          ],
+        }),
+        defineField({ name: "takenAt", title: "Frozen at", type: "datetime" }),
+      ],
+    }),
 
     defineField({ name: "appliedAt", title: "Applied", type: "datetime", readOnly: true, group: "timeline" }),
     defineField({ name: "approvedAt", title: "Approved", type: "datetime", readOnly: true, group: "timeline" }),
-    defineField({ name: "fundedAt", title: "Funds received", type: "datetime", readOnly: true, group: "timeline" }),
+    defineField({ name: "fundedAt", title: "Payment confirmed", type: "datetime", readOnly: true, group: "timeline" }),
     defineField({ name: "completedAt", title: "Completed", type: "datetime", readOnly: true, group: "timeline" }),
     defineField({
       name: "statusHistory",
@@ -246,12 +349,17 @@ export const lendingApplication = defineType({
             defineField({ name: "status", type: "string", options: { list: STATUS_OPTIONS } }),
             defineField({ name: "at", type: "datetime" }),
             defineField({ name: "by", type: "string" }),
+            defineField({ name: "event", type: "string" }),
+            defineField({ name: "note", type: "string" }),
           ],
           preview: {
-            select: { status: "status", at: "at", by: "by" },
-            prepare: ({ status, at, by }) => ({
-              title: STATUS_LABELS[status as LendingStatus] ?? status,
-              subtitle: [at && new Date(at).toLocaleString("en-GB"), by].filter(Boolean).join(" · "),
+            select: { status: "status", at: "at", by: "by", event: "event", note: "note" },
+            prepare: ({ status, at, by, event, note }) => ({
+              title:
+                event === "consent"
+                  ? "Lender consent"
+                  : `${event === "override" ? "Override → " : ""}${STATUS_LABELS[status as LendingStatus] ?? status}`,
+              subtitle: [at && new Date(at).toLocaleString("en-GB"), by, note].filter(Boolean).join(" · "),
             }),
           },
         }),

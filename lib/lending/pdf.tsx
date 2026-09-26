@@ -1,19 +1,24 @@
 /* eslint-disable jsx-a11y/alt-text -- react-pdf <Image> is not an HTML img and has no alt prop */
 import "server-only";
-import { Document, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import QRCode from "qrcode";
 import {
+  CONSENT_STATEMENT,
   formatCedis,
   formatDate,
   formatDateTime,
   formatPercent,
 } from "@/lib/lending/shared";
 import {
-  lendingUrl,
+  agreementTerms,
   renderClauses,
+  verificationUrl,
   type LendingApplication,
   type LendingSettings,
 } from "@/lib/lending/server";
+
+// Never break words with hyphens — names, codes and URLs must stay intact.
+Font.registerHyphenationCallback((word) => [word]);
 
 const GOLD = "#d4a017";
 const INK = "#111111";
@@ -73,9 +78,14 @@ const styles = StyleSheet.create({
   signature: { fontSize: 15, fontFamily: "Times-Italic", marginTop: 6, color: INK },
   partyName: { fontFamily: "Helvetica-Bold", marginTop: 6 },
   partyMeta: { fontSize: 8.5, color: MUTED, marginTop: 2 },
+  record: { marginTop: 14, borderWidth: 1, borderColor: RULE, borderRadius: 6, padding: 10 },
+  recordRow: { flexDirection: "row", marginTop: 3 },
+  recordLabel: { width: 110, fontSize: 8, color: MUTED },
+  recordValue: { flex: 1, fontSize: 8, color: INK },
   verify: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 18 },
   qr: { width: 72, height: 72 },
-  verifyText: { flex: 1, fontSize: 8.5, color: MUTED, lineHeight: 1.5 },
+  verifyBody: { flex: 1 },
+  verifyText: { fontSize: 8.5, color: MUTED, lineHeight: 1.5 },
   footer: {
     position: "absolute",
     bottom: 22,
@@ -101,22 +111,32 @@ function AgreementPdf({
 }: {
   app: LendingApplication;
   settings: LendingSettings;
-  qr: string;
+  qr: string | null;
   logos: Logos;
 }) {
+  const parties = agreementTerms(app, settings);
+  const verifyUrl = verificationUrl(app);
+  const record: [string, string | undefined][] = [
+    ["Signed by", app.consentName],
+    ["Timestamp (UTC)", app.consentAt],
+    ["Consent version", app.consentVersion],
+    ["IP address", app.consentIp],
+    ["Device / browser", app.consentUserAgent],
+    ["Agreement fingerprint", app.agreementHash ? `SHA-256 ${app.agreementHash}` : undefined],
+  ];
   const terms: [string, string][] = [
     ["PRINCIPAL", formatCedis(app.negotiatedAmount)],
     ["INTEREST", formatPercent(app.interestRate)],
     ["REPAYMENT", formatCedis(app.repaymentAmount)],
     ["TERM", `${app.termMonths} Months`],
-    ["FUNDED", formatDate(app.fundedAt)],
+    ["FUNDED", formatDate(app.fundedDate)],
     ["MATURITY", formatDate(app.maturityDate)],
   ];
 
   return (
     <Document
       title={`Lending Agreement ${app.agreementNumber}`}
-      author={settings.borrowerCompany}
+      author={parties.borrowerCompany}
       subject="Operation New Frontiers — Private Lending Agreement"
     >
       <Page size="A4" style={styles.page}>
@@ -136,10 +156,17 @@ function AgreementPdf({
         </View>
 
         <View style={styles.body}>
-          <Text style={styles.badge}>VERIFIED & EXECUTED</Text>
+          <Text style={styles.badge}>EXECUTED</Text>
           <Text style={styles.title}>Operation New Frontiers</Text>
           <Text style={styles.subtitle}>
-            Between {app.fullName} (Lender) and {settings.borrowerCompany} (Borrower)
+            Between {app.fullName} (Lender) and {parties.borrowerCompany} (Borrower)
+          </Text>
+          <Text style={[styles.partyMeta, { marginTop: 6 }]}>
+            Lender: {[app.fullName, app.address, app.email, app.phone].filter(Boolean).join(" · ")}
+          </Text>
+          <Text style={styles.partyMeta}>
+            Borrower: {parties.borrowerCompany}, represented by{" "}
+            {[parties.borrowerSignatory, parties.borrowerSignatoryTitle].filter(Boolean).join(", ")}
           </Text>
 
           <View style={styles.terms}>
@@ -158,8 +185,9 @@ function AgreementPdf({
           </View>
 
           <Text style={[styles.partyMeta, { marginTop: 8 }]}>
-            Payment reference: {app.agreementNumber} · Received via{" "}
-            {app.paymentMethod === "momo" ? "Mobile Money" : "bank transfer"}
+            Payment reference: {app.paymentReference ?? app.agreementNumber} · Received via{" "}
+            {app.paymentMethod === "momo" ? "Mobile Money" : "bank transfer"} · Verified against statement{" "}
+            {formatDate(app.fundedAt)}
           </Text>
 
           {renderClauses(app, settings).map((clause, index) => (
@@ -178,35 +206,56 @@ function AgreementPdf({
           <View style={styles.execution} wrap={false}>
             <Text style={styles.sectionTitle}>Digital Execution</Text>
             <Text style={styles.consent}>
-              The Lender confirmed: &quot;I have read and agree to the terms of this Lending Agreement. I
-              understand this constitutes my electronic signature.&quot;
+              The Lender selected &quot;I Agree&quot; to the following statement: &quot;
+              {app.consentStatement ?? CONSENT_STATEMENT}&quot;
             </Text>
             <View style={styles.parties}>
               <View style={styles.party}>
                 <Text style={styles.partyRole}>LENDER</Text>
                 <Text style={styles.signature}>{app.consentName}</Text>
                 <Text style={styles.partyName}>{app.fullName}</Text>
-                <Text style={styles.partyMeta}>Signed electronically {formatDateTime(app.consentAt)}</Text>
+                <Text style={styles.partyMeta}>Consented electronically {formatDateTime(app.consentAt)}</Text>
               </View>
               <View style={styles.party}>
                 <Text style={styles.partyRole}>BORROWER</Text>
-                <Text style={styles.signature}>{settings.borrowerSignatory}</Text>
-                <Text style={styles.partyName}>{settings.borrowerSignatory}</Text>
+                <Text style={styles.signature}>{parties.borrowerSignatory}</Text>
+                <Text style={styles.partyName}>{parties.borrowerSignatory}</Text>
                 <Text style={styles.partyMeta}>
-                  {[settings.borrowerSignatoryTitle, settings.borrowerCompany].filter(Boolean).join(", ")}
+                  {[parties.borrowerSignatoryTitle, parties.borrowerCompany].filter(Boolean).join(", ")}
                 </Text>
                 <Text style={styles.partyMeta}>Approved {formatDate(app.approvedAt)}</Text>
               </View>
             </View>
 
-            <View style={styles.verify}>
-              <Image src={qr} style={styles.qr} />
-              <Text style={styles.verifyText}>
-                Scan to verify this agreement against the live record held by {settings.borrowerCompany}.
-                Agreement {app.agreementNumber}. This document was generated electronically and is valid
-                without a handwritten signature.
-              </Text>
+            <View style={styles.record}>
+              <Text style={styles.partyRole}>ELECTRONIC SIGNATURE RECORD</Text>
+              {record
+                .filter(([, value]) => value)
+                .map(([label, value]) => (
+                  <View key={label} style={styles.recordRow}>
+                    <Text style={styles.recordLabel}>{label}</Text>
+                    <Text style={styles.recordValue}>{value}</Text>
+                  </View>
+                ))}
             </View>
+
+            {qr && verifyUrl ? (
+              <View style={styles.verify}>
+                <Image src={qr} style={styles.qr} />
+                <View style={styles.verifyBody}>
+                  <Text style={styles.verifyText}>
+                    Scan to verify this agreement against the live record held by {parties.borrowerCompany}.
+                  </Text>
+                  <Text style={styles.verifyText}>
+                    Or visit {verifyUrl.split("?")[0]} and enter agreement {app.agreementNumber} with verification
+                    code {app.verificationCode}.
+                  </Text>
+                  <Text style={[styles.verifyText, { marginTop: 4 }]}>
+                    This document was generated electronically and is valid without a handwritten signature.
+                  </Text>
+                </View>
+              </View>
+            ) : null}
           </View>
         </View>
 
@@ -236,8 +285,10 @@ export async function renderAgreementPdf(
   settings: LendingSettings,
   origin: string,
 ): Promise<Buffer> {
+  // The QR code encodes the public verification URL — never the lender's private token link.
+  const verifyUrl = verificationUrl(app);
   const [qr, icon, wordmark] = await Promise.all([
-    QRCode.toDataURL(lendingUrl(app.publicToken), { margin: 0, width: 240, color: { dark: INK } }),
+    verifyUrl ? QRCode.toDataURL(verifyUrl, { margin: 0, width: 240, color: { dark: INK } }) : null,
     fetchLogo(origin, "/brand/adakings-logo-icon.png"),
     fetchLogo(origin, "/brand/adakings-logo-wordmark.png"),
   ]);

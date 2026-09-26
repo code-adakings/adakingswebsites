@@ -25,7 +25,7 @@ export const lendingSettings = defineType({
       name: "borrowerCompany",
       title: "Borrower (company)",
       type: "string",
-      initialValue: "Adakings Foods & Beverages Company",
+      initialValue: "Adakings Foods & Beverages Company (Adakings Franchise Corporation LTD)",
       validation: (rule) => rule.required(),
       group: "borrower",
     }),

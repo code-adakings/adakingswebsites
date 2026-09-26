@@ -8,7 +8,7 @@ import { apiVersion, dataset, projectId, studioPreviewOrigin } from "./sanity/en
 import { schema } from "./sanity/schemaTypes";
 import { structure } from "./sanity/structure";
 import { resolve } from "./sanity/presentation/resolve";
-import { LendingTransitionAction } from "./sanity/lending/actions";
+import { LendingOverrideAction, LendingTransitionAction } from "./sanity/lending/actions";
 import { lendingPipelineTool } from "./sanity/lending/pipeline-tool";
 
 // Lending applications are only ever created by the site's form (which
@@ -42,7 +42,10 @@ export default defineConfig({
       if (schemaType === "lendingApplication") {
         return [
           LendingTransitionAction,
-          ...prev.filter(({ action }) => action !== "duplicate" && action !== "unpublish"),
+          // Status changes only via the actions above; the stock ones could
+          // copy, unpublish, or delete a legal record.
+          ...prev.filter(({ action }) => action === "publish" || action === "discardChanges"),
+          LendingOverrideAction,
         ];
       }
       if (schemaType === "lendingSettings") {

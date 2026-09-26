@@ -4,8 +4,9 @@ import { Building2, Check, Clock, Download, Lock, ShieldCheck, Smartphone } from
 import { cn } from "cn";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { LendingConsentForm } from "@/components/lending/consent-form";
+import { LendingConsentForm, ProceedToPaymentForm } from "@/components/lending/consent-form";
 import {
+  agreementTerms,
   getApplicationByToken,
   getLendingSettings,
   renderClauses,
@@ -18,15 +19,14 @@ import {
   formatDateTime,
   formatPercent,
   isAtLeast,
-  statusIndex,
-  type LendingStatus,
+  isExecuted,
 } from "@/lib/lending/shared";
 
 /**
  * A lender's private deal page — the only place their agreement lives. The
  * unguessable token in the URL is the access key, so the page is never
  * cached, indexed, or leaked via Referer. What it shows unlocks one status
- * at a time: review → provisional terms → payment details → signature → PDF.
+ * at a time: review → provisional terms → payment details → consent → PDF.
  */
 
 export const dynamic = "force-dynamic";
@@ -45,6 +45,7 @@ export default async function LendingDealPage({ params }: Params) {
   if (!app) notFound();
 
   const approved = isAtLeast(app.status, "APPROVED");
+  const executed = isExecuted(app);
 
   return (
     <>
@@ -55,16 +56,24 @@ export default async function LendingDealPage({ params }: Params) {
             <>
               <TermsSummary app={app} />
               {app.status === "APPROVED" ? (
-                <Notice icon={Lock}>
-                  This is your provisional agreement. Payment details will appear here once we send you payment
-                  instructions. Please don&apos;t transfer any funds before then.
-                </Notice>
+                <div className="space-y-4">
+                  <Notice icon={Lock}>
+                    This is your provisional agreement. Please read it carefully below. When you&apos;re ready to fund
+                    it, proceed to payment to see our bank and Mobile Money details.
+                  </Notice>
+                  <ProceedToPaymentForm token={token} />
+                </div>
               ) : null}
               {app.status === "PAYMENT_PENDING" ? <PaymentPanel app={app} settings={settings} /> : null}
-              {app.status === "PAYMENT_RECEIVED" ? (
+              {app.status === "PAYMENT_RECEIVED" && !executed ? (
                 <Notice icon={ShieldCheck} tone="positive">
-                  We&apos;ve received your payment of {formatCedis(app.negotiatedAmount)}. Your agreement is verified
-                  and active — please review it and sign below to download your final copy.
+                  We&apos;ve received and verified your payment of {formatCedis(app.negotiatedAmount)}. Your final
+                  agreement is below — give your digital consent at the end to download the executed copy.
+                </Notice>
+              ) : null}
+              {executed ? (
+                <Notice icon={ShieldCheck} tone="positive">
+                  This agreement is fully executed. Your signed PDF is available to download at the end of this page.
                 </Notice>
               ) : null}
               <AgreementText app={app} settings={settings} />
@@ -79,28 +88,39 @@ export default async function LendingDealPage({ params }: Params) {
   );
 }
 
-const BADGES: Record<LendingStatus, { label: string; className: string }> = {
-  APPLIED: { label: "Application Received", className: "border-white/25 text-white/80" },
-  UNDER_REVIEW: { label: "Under Review", className: "border-brand-gold/50 text-brand-gold" },
-  APPROVED: { label: "Provisional", className: "border-brand-gold/50 bg-brand-gold/10 text-brand-gold" },
-  PAYMENT_PENDING: { label: "Provisional · Awaiting Payment", className: "border-brand-gold/50 bg-brand-gold/10 text-brand-gold" },
-  PAYMENT_RECEIVED: { label: "Verified & Active", className: "border-emerald-400/40 bg-emerald-400/10 text-emerald-300" },
-  CONSENT_SIGNED: { label: "Verified & Executed", className: "border-emerald-400/40 bg-emerald-400/10 text-emerald-300" },
-  COMPLETED: { label: "Completed · Repaid", className: "border-white/25 bg-white/10 text-white" },
-};
+const GOLD_BADGE = "border-brand-gold/50 bg-brand-gold/10 text-brand-gold";
+const GREEN_BADGE = "border-emerald-400/40 bg-emerald-400/10 text-emerald-300";
 
-// Lender-facing milestones, each reached at the given workflow status.
-const MILESTONES: { label: string; reachedAt: LendingStatus }[] = [
-  { label: "Applied", reachedAt: "APPLIED" },
-  { label: "Terms", reachedAt: "APPROVED" },
-  { label: "Payment", reachedAt: "PAYMENT_PENDING" },
-  { label: "Verified", reachedAt: "PAYMENT_RECEIVED" },
-  { label: "Signed", reachedAt: "CONSENT_SIGNED" },
+function badgeFor(app: LendingApplication): { label: string; className: string } {
+  switch (app.status) {
+    case "APPLIED":
+      return { label: "Application Received", className: "border-white/25 text-white/80" };
+    case "UNDER_REVIEW":
+      return { label: "Under Review", className: "border-brand-gold/50 text-brand-gold" };
+    case "APPROVED":
+      return { label: "Provisional", className: GOLD_BADGE };
+    case "PAYMENT_PENDING":
+      return { label: "Provisional · Awaiting Payment", className: GOLD_BADGE };
+    case "PAYMENT_RECEIVED":
+      return app.consentAt
+        ? { label: "Executed", className: GREEN_BADGE }
+        : { label: "Payment Verified · Awaiting Consent", className: GREEN_BADGE };
+    case "COMPLETED":
+      return { label: "Executed", className: GREEN_BADGE };
+  }
+}
+
+// Lender-facing milestones.
+const MILESTONES: { label: string; reached: (app: LendingApplication) => boolean }[] = [
+  { label: "Applied", reached: () => true },
+  { label: "Terms", reached: (app) => isAtLeast(app.status, "APPROVED") },
+  { label: "Payment", reached: (app) => isAtLeast(app.status, "PAYMENT_PENDING") },
+  { label: "Verified", reached: (app) => isAtLeast(app.status, "PAYMENT_RECEIVED") },
+  { label: "Executed", reached: isExecuted },
 ];
 
 function DealHeader({ app }: { app: LendingApplication }) {
-  const badge = BADGES[app.status];
-  const current = statusIndex(app.status);
+  const badge = badgeFor(app);
 
   return (
     <header className="bg-brand-black py-10 text-white sm:py-14">
@@ -121,7 +141,7 @@ function DealHeader({ app }: { app: LendingApplication }) {
 
         <ol className="mt-8 grid grid-cols-5 gap-2" aria-label="Progress">
           {MILESTONES.map((milestone) => {
-            const reached = current >= statusIndex(milestone.reachedAt);
+            const reached = milestone.reached(app);
             return (
               <li key={milestone.label} className="space-y-2">
                 <div className={cn("h-1 rounded-full", reached ? "bg-brand-gold" : "bg-white/15")} />
@@ -195,7 +215,7 @@ function TermsSummary({ app }: { app: LendingApplication }) {
         <span className="font-medium text-foreground">
           {app.maturityDate ? formatDate(app.maturityDate) : `${app.termMonths} months from the date funds are received`}
         </span>
-        {app.fundedAt ? <> · Funded {formatDate(app.fundedAt)}</> : null}
+        {app.fundedDate ? <> · Funded {formatDate(app.fundedDate)}</> : null}
       </p>
     </div>
   );
@@ -215,7 +235,7 @@ function PaymentPanel({ app, settings }: { app: LendingApplication; settings: Le
         </p>
         <p className="mt-5 text-sm text-muted-foreground">Use your unique reference when paying.</p>
         <p className="mt-2 inline-block rounded-xl bg-brand-black px-5 py-2.5 font-mono text-lg font-semibold tracking-wider text-white select-all">
-          {app.agreementNumber}
+          {app.paymentReference ?? app.agreementNumber}
         </p>
       </div>
 
@@ -324,7 +344,8 @@ function Execution({
   settings: LendingSettings;
   token: string;
 }) {
-  const signed = isAtLeast(app.status, "CONSENT_SIGNED");
+  const signed = isExecuted(app);
+  const terms = agreementTerms(app, settings);
 
   return (
     <section id="execution" className="scroll-mt-24 space-y-6">
@@ -333,7 +354,9 @@ function Execution({
       {signed ? null : app.status === "PAYMENT_RECEIVED" ? (
         <LendingConsentForm token={token} lenderName={app.fullName} />
       ) : (
-        <Notice icon={Lock}>Signing opens once your payment has been received and verified.</Notice>
+        <Notice icon={Lock}>
+          Consent opens once our finance team has verified your payment against our bank or Mobile Money statement.
+        </Notice>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -341,15 +364,22 @@ function Execution({
           role="Lender"
           signature={signed ? app.consentName : undefined}
           name={app.fullName}
-          meta={signed ? `Signed ${formatDateTime(app.consentAt)}` : "Awaiting signature"}
+          meta={signed ? `Consented ${formatDateTime(app.consentAt)}` : "Awaiting consent"}
         />
         <SignatureCard
           role="Borrower"
-          signature={settings.borrowerSignatory}
-          name={settings.borrowerSignatory}
-          meta={[settings.borrowerSignatoryTitle, settings.borrowerCompany].filter(Boolean).join(", ")}
+          signature={terms.borrowerSignatory}
+          name={terms.borrowerSignatory}
+          meta={[terms.borrowerSignatoryTitle, terms.borrowerCompany].filter(Boolean).join(", ")}
         />
       </div>
+
+      {signed && app.consentVersion ? (
+        <p className="text-xs text-muted-foreground">
+          Electronic consent {app.consentVersion} recorded {formatDateTime(app.consentAt)}
+          {app.consentIp ? <> from IP {app.consentIp}</> : null}.
+        </p>
+      ) : null}
 
       {signed ? (
         <Button
@@ -358,7 +388,7 @@ function Execution({
           render={<a href={`/new-frontiers/d/${token}/pdf`} download />}
           className="h-11 w-full px-6 text-base sm:w-auto"
         >
-          <Download className="size-4" /> Download Signed PDF
+          <Download className="size-4" /> Download Executed Agreement (PDF)
         </Button>
       ) : null}
     </section>
