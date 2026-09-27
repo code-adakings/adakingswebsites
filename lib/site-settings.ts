@@ -1,7 +1,7 @@
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { siteSettingsQuery } from "@/sanity/lib/queries";
 import { siteConfig, mainNav as defaultMainNav, footerNav as defaultFooterNav } from "@/lib/site-config";
-import type { DayHours, Geopoint, PhoneNumber, SanitySiteSettings } from "@/types/sanity";
+import type { DayHours, Geopoint, NavItem, PhoneNumber, SanitySiteSettings } from "@/types/sanity";
 
 const SITE_SETTINGS_TAG = "siteSettings";
 
@@ -42,11 +42,19 @@ export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
     tags: [SITE_SETTINGS_TAG],
   });
 
+  // Drafts (seen in preview/draft mode) can hold half-filled links and footer
+  // groups; drop them rather than crash the layout on every page.
+  const navigation = completeNavItems(settings?.navigation);
+  const footerNav = (settings?.footerNav ?? [])
+    .filter((group) => group?.title)
+    .map((group) => ({ title: group.title, items: completeNavItems(group.items) }))
+    .filter((group) => group.items.length);
+
   return {
     siteName: settings?.siteName || siteConfig.name,
     orderUrl: settings?.orderUrl || siteConfig.orderUrl,
-    navigation: settings?.navigation?.length ? settings.navigation : defaultMainNav,
-    footerNav: settings?.footerNav?.length ? settings.footerNav : defaultFooterNav,
+    navigation: navigation.length ? navigation : defaultMainNav,
+    footerNav: footerNav.length ? footerNav : defaultFooterNav,
     social: {
       instagram: settings?.social?.instagram || siteConfig.social.instagram,
       facebook: settings?.social?.facebook || siteConfig.social.facebook,
@@ -67,4 +75,8 @@ export async function getSiteSettings(): Promise<ResolvedSiteSettings> {
     googleMapsUrl: settings?.googleMapsUrl || siteConfig.googleMapsUrl,
     businessHours: settings?.businessHours?.length ? settings.businessHours : [],
   };
+}
+
+function completeNavItems(items: NavItem[] | null | undefined): NavItem[] {
+  return (items ?? []).filter((item) => item?.label && item?.href);
 }
