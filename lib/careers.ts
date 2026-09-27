@@ -43,8 +43,8 @@ const FALLBACK_LIFE_AT_ADAKINGS: NonNullable<SanityCareersPage["lifeAtAdakings"]
 
 /** Shown under the culture gallery until Department documents exist in the Studio. */
 const FALLBACK_DEPARTMENTS: Department[] = [
-  { _id: "fallback-kitchen", title: "Kitchen Operations", slug: "kitchen-operations", icon: "chef-hat", description: "Chefs, line cooks, and kitchen assistants who keep every order fresh and fast." },
-  { _id: "fallback-customer", title: "Customer Operations", slug: "customer-operations", icon: "headset", description: "Front desk and packing teams who make every visit and pickup smooth." },
+  { _id: "fallback-kitchen", title: "Kitchen Operations", slug: "kitchen-operations", icon: "chef-hat", description: "Chefs, line cooks, kitchen assistants, and packers who keep every order fresh, fast, and accurately packed." },
+  { _id: "fallback-customer", title: "Customer Operations", slug: "customer-operations", icon: "headset", description: "Customer Operations ensures every customer enjoys a seamless experience—from welcoming walk-in guests and coordinating order pickups to handling enquiries, payments, and service recovery with professionalism and care." },
   { _id: "fallback-delivery", title: "Delivery Operations", slug: "delivery-operations", icon: "bike", description: "Riders who get hot meals to customers across campus and the city." },
   { _id: "fallback-marketing", title: "Marketing & Growth", slug: "marketing-growth", icon: "megaphone", description: "Storytellers and growth builders who bring new customers to Adakings." },
 ];

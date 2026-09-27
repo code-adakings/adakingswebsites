@@ -28,11 +28,11 @@ Like other seeded content, `hero.heroImage` is left empty (Sanity image fields n
 
 ## Careers
 
-`careers.ndjson` (14 documents), Studio → **Careers**:
+`careers.ndjson` (17 documents), Studio → **Careers**:
 
 - **Departments (4):** Kitchen Operations, Customer Operations, Delivery Operations, Marketing & Growth.
 - **Job Roles (7):** Chef, Line Cook, Kitchen Assistant, Packer, Front Desk Associate, Rider, Marketing Associate. Each role references its department.
-- **Job Postings (3):** Line Cook (TF Hostel), Kitchen Assistant (Bani Hostel), Marketing Associate (no branch). All are `Open` and `featured`, with full description, responsibilities, requirements, and benefits.
+- **Job Postings (6):** Line Cook, Kitchen Assistant, Packer, and Front Desk Associate (all TF Hostel), plus Rider and Marketing Associate (no branch). All are `Open` and `featured`, with full description, responsibilities, requirements, and benefits.
 
 A posting appears on `/careers` while its status is `Open` and its deadline (if set) hasn't passed. The featured grid shows open postings with **Featured** ticked; other open postings are listed underneath. Closed, filled, or expired postings still resolve at `/careers/<slug>`, but applications are disabled and the page is `noindex`.
 
