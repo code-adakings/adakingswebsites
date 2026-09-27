@@ -12,6 +12,7 @@ import {
 } from "@/sanity/lib/queries";
 import type { SanityJournalPage, SanityJournalPost, Seo } from "@/types/sanity";
 import type { JournalPost } from "@/types/journal";
+import { siteConfig } from "@/lib/site-config";
 
 const JOURNAL_TAG = "journalPost";
 const JOURNAL_PAGE_TAG = "journalPage";
@@ -35,7 +36,14 @@ function withReadingTime(post: SanityJournalPost): JournalPost {
       ? `${Math.round(readingTimeOverride)} min read`
       : readingTime(extractPlainText(post.body)).text;
 
-  return { ...rest, readingTime: computed };
+  // Drafts (and posts whose author or categories were deleted or never
+  // published) can come back with these missing.
+  return {
+    ...rest,
+    author: post.author ?? { name: `${siteConfig.name} Team`, slug: "" },
+    categories: (post.categories ?? []).filter(Boolean),
+    readingTime: computed,
+  };
 }
 
 export async function getAllPosts(): Promise<JournalPost[]> {
@@ -113,8 +121,9 @@ export async function getRelatedPosts(post: JournalPost, limit = 3): Promise<Jou
     tags: [JOURNAL_TAG],
   });
 
-  if (full?.relatedPosts?.length) {
-    return full.relatedPosts.slice(0, limit).map(withReadingTime);
+  const related = (full?.relatedPosts ?? []).filter(Boolean);
+  if (related.length) {
+    return related.slice(0, limit).map(withReadingTime);
   }
 
   const categoryTitles = post.categories.map((category) => category.title);
