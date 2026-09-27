@@ -75,7 +75,7 @@ Then the rest, in whatever order — each is independent:
 4. **Categories** — a few, e.g. "Company News", "Franchise", "Careers".
 5. **Journal Posts** — needs a hero image, an Author, and at least one Category to publish (those are required fields). Tick "Featured" on one post to make it the Journal page's featured story.
 6. **Branches** — name, address, status, opening hours, services, hero image.
-7. **Careers** — set Status to "Open" for roles that should show up on `/careers`.
+7. **Careers** — create Departments and Job Roles first, then Job Postings. A posting shows on `/careers` while its Status is "Open" and its deadline hasn't passed; tick "Featured" to put it in the Featured openings grid. Each posting gets its own page at `/careers/<slug>`.
 8. **Testimonials** — tick "Featured" on 1–3 so they show on the homepage (unfeatured ones just don't appear there).
 9. **Team Members** — shows on `/about`.
 
@@ -113,7 +113,7 @@ Without this, edits still go live automatically within ~60 seconds. With it, the
 ### CMS architecture
 
 - `sanity.config.ts` / `sanity.cli.ts` — Studio config, mounted at `/studio` via `app/studio/[[...tool]]/page.tsx`
-- `sanity/schemaTypes/documents/` — the 9 content types (Homepage, Journal Post, Author, Category, Career, Branch, Testimonial, Team Member, Site Settings)
+- `sanity/schemaTypes/documents/` — the 9 content types (Homepage, Journal Post, Author, Category, Department / Job Role / Job Posting, Branch, Testimonial, Team Member, Site Settings)
 - `sanity/schemaTypes/objects/` — reusable field groups (SEO, CTA link, opening hours, social links, nav items)
 - `sanity/structure.ts` — Studio desk structure (pins the two singletons — Homepage, Site Settings — above the document lists)
 - `sanity/lib/queries.ts` — GROQ queries, one per page/section's data need
@@ -148,4 +148,5 @@ Without this, edits still go live automatically within ~60 seconds. With it, the
 - **Photography**: pages fall back to a branded placeholder (`components/ui/placeholder-image.tsx`) wherever a Sanity image field is empty — upload real photography in the Studio to replace it, no code changes needed (`components/ui/sanity-image.tsx` handles the swap automatically).
 - **Newsletter signup**: UI-only, not yet wired to an email provider (e.g. Resend, Mailchimp).
 - **Contact form**: opens the visitor's email client via `mailto:` — no backend/API yet.
-- **Careers**: applications link out to each role's `applicationUrl` (external ATS or `mailto:`) — no in-house ATS.
+- **Careers**: each job page's application form saves a **Job Application** document (Studio → Careers → Applications) with the applicant's details, their PDF CV (max 4 MB), a link to the posting, a status (New → Screening → Interview → Hired, or Rejected), and HR notes. Applications use private `jobApplication.<uuid>` IDs and can only be created by the form. Requires `SANITY_API_WRITE_TOKEN`. The CV is optional but recommended in the UI. Each application triggers an email alert to `CAREERS_NOTIFY_EMAIL` (via Resend, applicant set as reply-to, CV not attached, with a link to the application in Studio). The email is sent after the response, so a mail failure never loses an application.
+- **The dataset must be private** because it holds CVs, and on a public dataset anyone can list and download every uploaded file. The site reads with `SANITY_API_READ_TOKEN`, so roll out in this order: (1) put a valid Viewer token in `SANITY_API_READ_TOKEN` locally and on Vercel, (2) deploy, (3) run `npx sanity dataset visibility set production private`. Doing step 3 before steps 1–2 takes the public site down. Image URLs on cdn.sanity.io stay public either way.

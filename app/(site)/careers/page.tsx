@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { PageHero } from "@/components/ui/page-hero";
-import { FinalCta } from "@/components/sections/home/final-cta";
-import { WhyWorkHere } from "@/components/sections/careers/why-work-here";
-import { LifeAtAdakings } from "@/components/sections/careers/life-at-adakings";
-import { OpenPositions } from "@/components/sections/careers/open-positions";
-import { HiringProcess } from "@/components/sections/careers/hiring-process";
-import { EmployeeValues } from "@/components/sections/careers/employee-values";
-import { getCareersPage, getOpenCareers } from "@/lib/careers";
+import { CareerHero } from "@/components/careers/career-hero";
+import { WhyWorkHere } from "@/components/careers/why-work-here";
+import { CultureGallery } from "@/components/careers/culture-gallery";
+import { FeaturedJobs } from "@/components/careers/featured-jobs";
+import { HiringProcess } from "@/components/careers/hiring-process";
+import { Benefits } from "@/components/careers/benefits";
+import { CareersFaq } from "@/components/careers/careers-faq";
+import { TalentPoolCta } from "@/components/careers/talent-pool-cta";
+import { getCareersPage, getDepartments, getFeaturedJobs, getOpenJobs } from "@/lib/careers";
 import { getSiteSettings } from "@/lib/site-settings";
 import { buildMetadata } from "@/lib/seo";
 import { JsonLd, breadcrumbSchema, jobPostingSchema } from "@/lib/structured-data";
 
 const FALLBACK_DESCRIPTION =
-  "Build your career with Adakings — kitchen, operations, and corporate roles across Ghana.";
+  "Build your career with Adakings — kitchen, customer, delivery, and marketing roles across Ghana.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { seo } = await getCareersPage();
@@ -26,24 +27,44 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CareersPage() {
-  const [
-    { hero, image, cvCtaLabel, whyWorkHere, lifeAtAdakings, departments, hiringProcess, employeeValues, finalCta },
-    openRoles,
-    settings,
-  ] = await Promise.all([getCareersPage(), getOpenCareers(), getSiteSettings()]);
+  const [page, featuredJobs, openJobs, departments, settings] = await Promise.all([
+    getCareersPage(),
+    getFeaturedJobs(),
+    getOpenJobs(),
+    getDepartments(),
+    getSiteSettings(),
+  ]);
+  const { hero, image, whyWorkHere, lifeAtAdakings, hiringProcess, benefits, faq, talentPool } = page;
+
+  const featuredIds = new Set(featuredJobs.map((job) => job._id));
+  const otherOpenJobs = openJobs.filter((job) => !featuredIds.has(job._id));
+
+  const talentPoolCta = talentPool.cta?.href
+    ? talentPool.cta
+    : {
+        label: talentPool.cta?.label || "Join the talent pool",
+        href: `mailto:${settings.contactEmail}?subject=${encodeURIComponent("Adakings Talent Pool")}`,
+      };
 
   return (
     <>
       <JsonLd
         data={[
-          ...openRoles.map((career) => jobPostingSchema(career, settings)),
+          ...openJobs.filter((job) => !job.noIndex).map((job) => jobPostingSchema(job, settings)),
           breadcrumbSchema([
             { name: "Home", path: "/" },
             { name: "Careers", path: "/careers" },
           ]),
         ]}
       />
-      <PageHero eyebrow={hero.eyebrow} title={hero.title} description={hero.description} />
+
+      <CareerHero
+        eyebrow={hero.eyebrow}
+        title={hero.title}
+        description={hero.description}
+        image={image}
+        openRolesCount={openJobs.length}
+      />
 
       <WhyWorkHere
         eyebrow={whyWorkHere.eyebrow}
@@ -52,7 +73,7 @@ export default async function CareersPage() {
         cards={whyWorkHere.cards}
       />
 
-      <LifeAtAdakings
+      <CultureGallery
         eyebrow={lifeAtAdakings.eyebrow}
         heading={lifeAtAdakings.heading}
         description={lifeAtAdakings.description}
@@ -61,29 +82,20 @@ export default async function CareersPage() {
         departments={departments}
       />
 
-      <OpenPositions
-        careers={openRoles}
-        image={image}
-        cvCtaLabel={cvCtaLabel}
-        contactEmail={settings.contactEmail}
-      />
+      <FeaturedJobs featured={featuredJobs} otherOpenJobs={otherOpenJobs} />
 
       <HiringProcess eyebrow={hiringProcess.eyebrow} heading={hiringProcess.heading} steps={hiringProcess.steps} />
 
-      <EmployeeValues
-        eyebrow={employeeValues.eyebrow}
-        heading={employeeValues.heading}
-        description={employeeValues.description}
-        values={employeeValues.values}
+      <Benefits
+        eyebrow={benefits.eyebrow}
+        heading={benefits.heading}
+        description={benefits.description}
+        items={benefits.items}
       />
 
-      <FinalCta
-        heading={finalCta.heading}
-        description={finalCta.description}
-        primaryCta={finalCta.cta}
-        secondaryCta={undefined}
-        primaryCtaEvent={null}
-      />
+      <CareersFaq eyebrow={faq.eyebrow} heading={faq.heading} items={faq.items} />
+
+      <TalentPoolCta heading={talentPool.heading} description={talentPool.description} cta={talentPoolCta} />
     </>
   );
 }

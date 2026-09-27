@@ -2,11 +2,18 @@ import { createClient } from "next-sanity";
 import { apiVersion, dataset, projectId, useCdn } from "../env";
 import { readToken } from "./token";
 
+/**
+ * Published-content client for the public site. It sends the read token so
+ * the site keeps working when the dataset is private (it must be: job
+ * applications and their CV assets live in it). Server-only: the token
+ * module throws if this is ever imported into browser code.
+ */
 export const client = createClient({
   projectId,
   dataset,
   apiVersion,
   useCdn,
+  token: readToken,
   perspective: "published",
   stega: false,
 });

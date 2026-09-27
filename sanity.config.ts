@@ -14,6 +14,10 @@ import { lendingPipelineTool } from "./sanity/lending/pipeline-tool";
 // Lending applications are only ever created by the site's form (which
 // issues the lender's private token), and settings is a fixed-id singleton.
 const LENDING_TYPES = new Set(["lendingApplication", "lendingSettings"]);
+// Job applications are only created by the job page form, which gives them a
+// private `jobApplication.<uuid>` id. Studio-created or duplicated copies would
+// get a plain id and bypass that.
+const FORM_ONLY_TYPES = new Set([...LENDING_TYPES, "jobApplication"]);
 
 export default defineConfig({
   basePath: "/studio",
@@ -37,7 +41,7 @@ export default defineConfig({
   ],
   tools: (prev) => [...prev, lendingPipelineTool],
   document: {
-    newDocumentOptions: (prev) => prev.filter((item) => !LENDING_TYPES.has(item.templateId)),
+    newDocumentOptions: (prev) => prev.filter((item) => !FORM_ONLY_TYPES.has(item.templateId)),
     actions: (prev, { schemaType }) => {
       if (schemaType === "lendingApplication") {
         return [
@@ -47,6 +51,9 @@ export default defineConfig({
           ...prev.filter(({ action }) => action === "publish" || action === "discardChanges"),
           LendingOverrideAction,
         ];
+      }
+      if (schemaType === "jobApplication") {
+        return prev.filter(({ action }) => action !== "duplicate");
       }
       if (schemaType === "lendingSettings") {
         return prev.filter(({ action }) => action === "publish" || action === "discardChanges");

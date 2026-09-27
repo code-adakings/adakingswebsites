@@ -1,7 +1,7 @@
 import { TrendingUp, Users, HeartHandshake, GraduationCap, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
-import type { CareersWhyCard } from "@/types/sanity";
+import type { CareersWhyCard } from "@/types/career";
 
 const ICONS: Record<string, LucideIcon> = {
   "trending-up": TrendingUp,

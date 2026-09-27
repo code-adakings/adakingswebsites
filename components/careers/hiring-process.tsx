@@ -1,7 +1,7 @@
 import { FileText, PhoneCall, Users, ClipboardCheck, Rocket, type LucideIcon } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
-import type { CareersProcessStep } from "@/types/sanity";
+import type { CareersProcessStep } from "@/types/career";
 
 const ICONS: Record<string, LucideIcon> = {
   "file-text": FileText,

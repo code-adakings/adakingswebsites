@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
 import { getPostsForSitemap } from "@/lib/journal";
+import { getOpenJobs } from "@/lib/careers";
 
 const STATIC_ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
   { path: "/", changeFrequency: "weekly", priority: 1 },
@@ -16,7 +17,7 @@ const STATIC_ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[numb
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getPostsForSitemap();
+  const [posts, openJobs] = await Promise.all([getPostsForSitemap(), getOpenJobs()]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
     url: `${siteConfig.url}${route.path}`,
@@ -33,5 +34,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-  return [...staticEntries, ...journalEntries];
+  const jobEntries: MetadataRoute.Sitemap = openJobs
+    .filter((job) => !job.noIndex)
+    .map((job) => ({
+      url: `${siteConfig.url}/careers/${job.slug}`,
+      lastModified: job.postedAt ? new Date(job.postedAt) : undefined,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    }));
+
+  return [...staticEntries, ...journalEntries, ...jobEntries];
 }

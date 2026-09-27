@@ -1,16 +1,15 @@
 import Link from "next/link";
-import { ArrowRight, MapPin, Briefcase } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { ScrollRail, ScrollRailItem } from "@/components/ui/scroll-rail";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { TrackClick } from "@/components/analytics/track-click";
-import { getCareersPage, getOpenCareers } from "@/lib/careers";
+import { JobCard } from "@/components/careers/job-card";
+import { getCareersPage, getOpenJobs } from "@/lib/careers";
 
 export async function Careers() {
-  const [{ homeCta }, allOpenCareers] = await Promise.all([getCareersPage(), getOpenCareers()]);
-  const openCareers = allOpenCareers.slice(0, 3);
+  const [{ homeCta }, allOpenJobs] = await Promise.all([getCareersPage(), getOpenJobs()]);
+  // Featured roles sort first (see allOpenJobsQuery).
+  const openJobs = allOpenJobs.slice(0, 3);
 
   return (
     <Section>
@@ -26,33 +25,11 @@ export async function Careers() {
           </Button>
         </div>
 
-        {openCareers.length > 0 ? (
+        {openJobs.length > 0 ? (
           <ScrollRail className="mt-8 sm:mt-12 sm:grid-cols-3 sm:gap-4">
-            {openCareers.map((career) => (
-              <ScrollRailItem
-                key={career.slug}
-                className="flex w-[80%] flex-col rounded-2xl border border-border bg-background p-6"
-              >
-                <h3 className="text-base font-semibold">{career.title}</h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Badge variant="outline" className="gap-1">
-                    <MapPin className="size-3" />
-                    {career.location}
-                  </Badge>
-                  <Badge variant="outline" className="gap-1">
-                    <Briefcase className="size-3" />
-                    {career.employmentType}
-                  </Badge>
-                </div>
-                <TrackClick event="career_apply" params={{ method: "application_url", role: career.title }}>
-                  <Button
-                    render={<a href={career.applicationUrl} target="_blank" rel="noopener noreferrer" />}
-                    className="mt-6 w-fit bg-primary text-primary-foreground hover:bg-brand-red-dark"
-                  >
-                    Apply Now
-                    <ArrowRight className="size-4" />
-                  </Button>
-                </TrackClick>
+            {openJobs.map((job) => (
+              <ScrollRailItem key={job._id} className="flex w-[80%]">
+                <JobCard job={job} className="w-full" />
               </ScrollRailItem>
             ))}
           </ScrollRail>

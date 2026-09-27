@@ -53,8 +53,24 @@ const components: PortableTextComponents = {
     ),
     normal: ({ children }) => <p className="mt-5 leading-7 text-foreground/90">{children}</p>,
   },
+  list: {
+    bullet: ({ children }) => (
+      <ul className="mt-5 list-disc space-y-2 pl-6 marker:text-primary">{children}</ul>
+    ),
+    number: ({ children }) => (
+      <ol className="mt-5 list-decimal space-y-2 pl-6 marker:font-semibold marker:text-primary">{children}</ol>
+    ),
+  },
+  listItem: ({ children }) => <li className="pl-1 leading-7 text-foreground/90">{children}</li>,
 };
 
-export function JournalBody({ value }: { value: Parameters<typeof PortableText>[0]["value"] }) {
+type PortableTextValue = Parameters<typeof PortableText>[0]["value"];
+
+/** Generic Sanity rich-text renderer (richTextBlock), shared by Journal and Careers. */
+export function RichText({ value }: { value: PortableTextValue }) {
   return <PortableText value={value} components={components} />;
+}
+
+export function JournalBody({ value }: { value: PortableTextValue }) {
+  return <RichText value={value} />;
 }

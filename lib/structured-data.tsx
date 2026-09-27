@@ -3,7 +3,8 @@ import { absoluteUrl, DEFAULT_OG_IMAGE } from "@/lib/seo";
 import { urlFor } from "@/sanity/lib/image";
 import { extractPlainText } from "@/sanity/lib/portable-text";
 import type { ResolvedSiteSettings } from "@/lib/site-settings";
-import type { DayHours, SanityBranch, SanityCareer, SanityImage } from "@/types/sanity";
+import type { DayHours, PortableTextBlock, SanityBranch, SanityImage } from "@/types/sanity";
+import type { EmploymentType, JobPostingCard } from "@/types/career";
 import type { JournalPost } from "@/types/journal";
 
 export function JsonLd({ data }: { data: object | object[] }) {
@@ -166,22 +167,27 @@ export function articleSchema(post: JournalPost) {
   };
 }
 
-const EMPLOYMENT_TYPE_MAP: Record<string, string> = {
+const EMPLOYMENT_TYPE_MAP: Record<EmploymentType, string> = {
   "Full-time": "FULL_TIME",
   "Part-time": "PART_TIME",
-  Contract: "CONTRACTOR",
   Internship: "INTERN",
 };
 
-export function jobPostingSchema(career: SanityCareer, settings: ResolvedSiteSettings) {
+export function jobPostingSchema(
+  job: JobPostingCard & { description?: PortableTextBlock[] },
+  settings: ResolvedSiteSettings,
+) {
   return {
     "@context": "https://schema.org",
     "@type": "JobPosting",
-    title: career.title,
-    description: extractPlainText(career.description) || career.title,
-    datePosted: career.postedAt,
-    validThrough: career.deadline || undefined,
-    employmentType: EMPLOYMENT_TYPE_MAP[career.employmentType] ?? "OTHER",
+    title: job.title,
+    description: extractPlainText(job.description) || job.summary || job.title,
+    url: absoluteUrl(`/careers/${job.slug}`),
+    datePosted: job.postedAt,
+    // End of the deadline day, so the role doesn't expire at midnight UTC that morning.
+    validThrough: job.deadline ? `${job.deadline}T23:59:59Z` : undefined,
+    employmentType: EMPLOYMENT_TYPE_MAP[job.employmentType] ?? "OTHER",
+    directApply: true,
     hiringOrganization: {
       "@type": "Organization",
       name: settings.siteName,
@@ -190,14 +196,18 @@ export function jobPostingSchema(career: SanityCareer, settings: ResolvedSiteSet
     },
     jobLocation: {
       "@type": "Place",
-      address: { "@type": "PostalAddress", addressLocality: career.location, addressCountry: "GH" },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: job.branch?.city || job.location,
+        addressCountry: "GH",
+      },
     },
-    ...(career.salary
+    ...(job.salary
       ? {
           baseSalary: {
             "@type": "MonetaryAmount",
             currency: "GHS",
-            value: { "@type": "QuantitativeValue", value: career.salary },
+            value: { "@type": "QuantitativeValue", value: job.salary },
           },
         }
       : {}),
