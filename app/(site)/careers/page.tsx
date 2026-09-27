@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { CareerHero } from "@/components/careers/career-hero";
 import { WhyWorkHere } from "@/components/careers/why-work-here";
 import { CultureGallery } from "@/components/careers/culture-gallery";
-import { FeaturedJobs } from "@/components/careers/featured-jobs";
+import { OpenRoles } from "@/components/careers/open-roles";
 import { HiringProcess } from "@/components/careers/hiring-process";
 import { Benefits } from "@/components/careers/benefits";
 import { CareersFaq } from "@/components/careers/careers-faq";
 import { TalentPoolCta } from "@/components/careers/talent-pool-cta";
-import { getCareersPage, getDepartments, getFeaturedJobs, getOpenJobs } from "@/lib/careers";
+import { getCareersPage, getDepartments, getListedJobs } from "@/lib/careers";
 import { getSiteSettings } from "@/lib/site-settings";
 import { buildMetadata } from "@/lib/seo";
 import { JsonLd, breadcrumbSchema, jobPostingSchema } from "@/lib/structured-data";
@@ -27,17 +27,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CareersPage() {
-  const [page, featuredJobs, openJobs, departments, settings] = await Promise.all([
+  const [page, listedJobs, departments, settings] = await Promise.all([
     getCareersPage(),
-    getFeaturedJobs(),
-    getOpenJobs(),
+    getListedJobs(),
     getDepartments(),
     getSiteSettings(),
   ]);
   const { hero, image, whyWorkHere, lifeAtAdakings, hiringProcess, benefits, faq, talentPool } = page;
-
-  const featuredIds = new Set(featuredJobs.map((job) => job._id));
-  const otherOpenJobs = openJobs.filter((job) => !featuredIds.has(job._id));
 
   const talentPoolCta = talentPool.cta?.href
     ? talentPool.cta
@@ -50,7 +46,7 @@ export default async function CareersPage() {
     <>
       <JsonLd
         data={[
-          ...openJobs.filter((job) => !job.noIndex).map((job) => jobPostingSchema(job, settings)),
+          ...listedJobs.filter((job) => !job.noIndex).map((job) => jobPostingSchema(job, settings)),
           breadcrumbSchema([
             { name: "Home", path: "/" },
             { name: "Careers", path: "/careers" },
@@ -63,7 +59,7 @@ export default async function CareersPage() {
         title={hero.title}
         description={hero.description}
         image={image}
-        openRolesCount={openJobs.length}
+        openRolesCount={listedJobs.length}
       />
 
       <WhyWorkHere
@@ -82,7 +78,7 @@ export default async function CareersPage() {
         departments={departments}
       />
 
-      <FeaturedJobs featured={featuredJobs} otherOpenJobs={otherOpenJobs} />
+      <OpenRoles jobs={listedJobs} />
 
       <HiringProcess eyebrow={hiringProcess.eyebrow} heading={hiringProcess.heading} steps={hiringProcess.steps} />
 

@@ -79,14 +79,6 @@ export const jobPosting = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "featured",
-      title: "Featured",
-      type: "boolean",
-      group: "details",
-      description: "Featured open roles are shown on the Careers page.",
-      initialValue: false,
-    }),
-    defineField({
       name: "status",
       title: "Status",
       type: "string",
@@ -153,11 +145,10 @@ export const jobPosting = defineType({
       title: "title",
       department: "department.title",
       status: "status",
-      featured: "featured",
     },
-    prepare({ title, department, status, featured }) {
+    prepare({ title, department, status }) {
       return {
-        title: featured ? `★ ${title}` : title,
+        title,
         subtitle: [department, status].filter(Boolean).join(" · "),
       };
     },

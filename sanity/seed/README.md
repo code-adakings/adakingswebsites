@@ -32,9 +32,9 @@ Like other seeded content, `hero.heroImage` is left empty (Sanity image fields n
 
 - **Departments (4):** Kitchen Operations, Customer Operations, Delivery Operations, Marketing & Growth.
 - **Job Roles (7):** Chef, Line Cook, Kitchen Assistant, Packer, Front Desk Associate, Rider, Marketing Associate. Each role references its department.
-- **Job Postings (6):** Line Cook, Kitchen Assistant, Packer, and Front Desk Associate (all TF Hostel), plus Rider and Marketing Associate (no branch). All are `Open` and `featured`, with full description, responsibilities, requirements, and benefits.
+- **Job Postings (6):** Line Cook, Kitchen Assistant, Packer, and Front Desk Associate (all TF Hostel), plus Rider and Marketing Associate (no branch). All are `Open`, with full description, responsibilities, requirements, and benefits.
 
-A posting appears on `/careers` while its status is `Open` and its deadline (if set) hasn't passed. The featured grid shows open postings with **Featured** ticked; other open postings are listed underneath. Closed, filled, or expired postings still resolve at `/careers/<slug>`, but applications are disabled and the page is `noindex`.
+A posting is open while its status is `Open` and its deadline (if set) hasn't passed. The Careers page and homepage list at most three open postings: the ones picked under **Careers Page Settings → Open Roles → Top 3 urgent roles**, in that order, or the three newest open postings if none are picked. Every other open posting is hidden from those listings but keeps its own page at `/careers/<slug>` (and its sitemap entry), so its link can be shared directly. Closed, filled, or expired postings still resolve at `/careers/<slug>`, but applications are disabled and the page is `noindex`.
 
 The legacy `career` type (Phase 3.1) was replaced by `jobPosting`. If your dataset still contains the old `career-*` documents, delete them in Vision or with `npx sanity documents delete career-kitchen-assistant career-fry-chef career-customer-service-associate`.
 

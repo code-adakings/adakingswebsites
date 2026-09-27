@@ -4,12 +4,10 @@ import { Section, SectionHeading } from "@/components/ui/section";
 import { ScrollRail, ScrollRailItem } from "@/components/ui/scroll-rail";
 import { Button } from "@/components/ui/button";
 import { JobCard } from "@/components/careers/job-card";
-import { getCareersPage, getOpenJobs } from "@/lib/careers";
+import { getCareersPage, getListedJobs } from "@/lib/careers";
 
 export async function Careers() {
-  const [{ homeCta }, allOpenJobs] = await Promise.all([getCareersPage(), getOpenJobs()]);
-  // Featured roles sort first (see allOpenJobsQuery).
-  const openJobs = allOpenJobs.slice(0, 3);
+  const [{ homeCta }, openJobs] = await Promise.all([getCareersPage(), getListedJobs()]);
 
   return (
     <Section>

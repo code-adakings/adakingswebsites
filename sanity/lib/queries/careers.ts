@@ -28,7 +28,6 @@ const jobCardFieldList = /* groq */ `
   employmentType,
   salary,
   location,
-  "featured": coalesce(featured, false),
   status,
   deadline,
   postedAt,
@@ -60,12 +59,16 @@ export const careerPageQuery = defineQuery(`
   }
 `);
 
-export const featuredJobsQuery = defineQuery(`
-  *[${openJobFilter} && featured == true] | order(postedAt desc) { ${jobCardFieldList} }
+/**
+ * The roles picked under Careers Page Settings → Open Roles, in the editor's
+ * order. Picks that have since closed or expired drop out.
+ */
+export const urgentJobsQuery = defineQuery(`
+  (*[_type == "careersPage"][0].urgentJobs[]->)[${openJobFilter}] { ${jobCardFieldList} }
 `);
 
 export const allOpenJobsQuery = defineQuery(`
-  *[${openJobFilter}] | order(coalesce(featured, false) desc, postedAt desc) { ${jobCardFieldList} }
+  *[${openJobFilter}] | order(postedAt desc) { ${jobCardFieldList} }
 `);
 
 /** Matches any status, so closed/filled postings still resolve (with applications disabled). */
