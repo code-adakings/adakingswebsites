@@ -16,6 +16,15 @@ const HIRING_PROCESS_ICONS = [
   { title: "Onboarding", value: "rocket" },
 ];
 
+const BENEFIT_ICONS = [
+  { title: "Wallet (pay)", value: "wallet" },
+  { title: "Utensils (staff meals)", value: "utensils" },
+  { title: "Graduation cap (training)", value: "graduation-cap" },
+  { title: "Trending up (promotion)", value: "trending-up" },
+  { title: "Shield (health & safety)", value: "shield-check" },
+  { title: "Calendar (flexible shifts)", value: "calendar-clock" },
+];
+
 export const careersPage = defineType({
   name: "careersPage",
   title: "Careers Page",
@@ -24,11 +33,11 @@ export const careersPage = defineType({
   groups: [
     { name: "hero", title: "Hero", default: true },
     { name: "whyWorkHere", title: "Why Work Here" },
-    { name: "lifeAtAdakings", title: "Life at Adakings" },
-    { name: "departments", title: "Departments" },
+    { name: "culture", title: "Culture Gallery" },
     { name: "hiringProcess", title: "Hiring Process" },
-    { name: "employeeValues", title: "Employee Values" },
-    { name: "finalCta", title: "Final CTA" },
+    { name: "benefits", title: "Benefits" },
+    { name: "faq", title: "FAQ" },
+    { name: "talentPool", title: "Talent Pool CTA" },
     { name: "homeCta", title: "Homepage promo" },
     { name: "seo", title: "SEO" },
   ],
@@ -47,13 +56,8 @@ export const careersPage = defineType({
       type: "image",
       group: "hero",
       options: { hotspot: true },
-      description: "Shown on the Careers page and reused on the homepage careers promo.",
-    }),
-    defineField({
-      name: "cvCtaLabel",
-      title: '"Send us your CV" button label',
-      type: "string",
-      group: "hero",
+      description: "Shown in the Careers hero and used as the Careers social share image.",
+      fields: [defineField({ name: "alt", title: "Alt text", type: "string" })],
     }),
     defineField({
       name: "whyWorkHere",
@@ -93,10 +97,11 @@ export const careersPage = defineType({
     }),
     defineField({
       name: "lifeAtAdakings",
-      title: "Life at Adakings",
+      title: "Culture gallery",
       type: "object",
-      group: "lifeAtAdakings",
-      description: "Editorial section with a photo gallery and an optional employee quote.",
+      group: "culture",
+      description:
+        "Photo gallery and an optional employee quote. Departments listed under it come from Careers → Departments.",
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string" }),
         defineField({ name: "heading", title: "Heading", type: "string" }),
@@ -106,7 +111,13 @@ export const careersPage = defineType({
           title: "Gallery",
           type: "array",
           validation: (rule) => rule.max(6),
-          of: [{ type: "image", options: { hotspot: true } }],
+          of: [
+            {
+              type: "image",
+              options: { hotspot: true },
+              fields: [defineField({ name: "alt", title: "Alt text", type: "string" })],
+            },
+          ],
         }),
         defineField({
           name: "quote",
@@ -118,24 +129,6 @@ export const careersPage = defineType({
             defineField({ name: "role", title: "Role", type: "string" }),
           ],
         }),
-      ],
-    }),
-    defineField({
-      name: "departments",
-      title: "Departments",
-      type: "array",
-      group: "departments",
-      description: "Shown as \"Where you could work\" within the Life at Adakings section.",
-      of: [
-        {
-          type: "object",
-          name: "department",
-          fields: [
-            defineField({ name: "name", title: "Name", type: "string", validation: (rule) => rule.required() }),
-            defineField({ name: "description", title: "Description", type: "text", rows: 2 }),
-          ],
-          preview: { select: { title: "name", subtitle: "description" } },
-        },
       ],
     }),
     defineField({
@@ -174,40 +167,79 @@ export const careersPage = defineType({
       ],
     }),
     defineField({
-      name: "employeeValues",
-      title: "Employee Values",
+      name: "benefits",
+      title: "Benefits",
       type: "object",
-      group: "employeeValues",
-      description: "Core values that guide how the team works, e.g. Integrity, Hustle, Hospitality.",
+      group: "benefits",
+      description: "Company-wide perks. Role-specific benefits live on each job posting.",
       fields: [
         defineField({ name: "eyebrow", title: "Eyebrow", type: "string" }),
         defineField({ name: "heading", title: "Heading", type: "string" }),
         defineField({ name: "description", title: "Description", type: "text", rows: 2 }),
         defineField({
-          name: "values",
-          title: "Values",
+          name: "items",
+          title: "Benefits",
           type: "array",
           validation: (rule) => rule.max(6),
           of: [
             {
               type: "object",
-              name: "employeeValue",
+              name: "careersBenefit",
               fields: [
+                defineField({
+                  name: "icon",
+                  title: "Icon",
+                  type: "string",
+                  options: { list: BENEFIT_ICONS },
+                  validation: (rule) => rule.required(),
+                }),
                 defineField({ name: "title", title: "Title", type: "string", validation: (rule) => rule.required() }),
                 defineField({ name: "description", title: "Description", type: "text", rows: 2 }),
               ],
-              preview: { select: { title: "title", subtitle: "description" } },
+              preview: { select: { title: "title", subtitle: "icon" } },
             },
           ],
         }),
       ],
     }),
     defineField({
-      name: "finalCta",
-      title: "Final CTA",
+      name: "faq",
+      title: "FAQ",
       type: "object",
-      group: "finalCta",
-      description: "Closing call-to-action shown at the bottom of the Careers page.",
+      group: "faq",
+      fields: [
+        defineField({ name: "eyebrow", title: "Eyebrow", type: "string" }),
+        defineField({ name: "heading", title: "Heading", type: "string" }),
+        defineField({
+          name: "items",
+          title: "Questions",
+          type: "array",
+          of: [
+            {
+              type: "object",
+              name: "careersFaqItem",
+              fields: [
+                defineField({
+                  name: "question",
+                  title: "Question",
+                  type: "string",
+                  validation: (rule) => rule.required(),
+                }),
+                defineField({ name: "answer", title: "Answer", type: "text", rows: 3 }),
+              ],
+              preview: { select: { title: "question", subtitle: "answer" } },
+            },
+          ],
+        }),
+      ],
+    }),
+    defineField({
+      name: "talentPool",
+      title: "Talent Pool CTA",
+      type: "object",
+      group: "talentPool",
+      description:
+        "Closing call-to-action for candidates who don't see a matching role. Leave the CTA link empty to email the site contact address.",
       fields: [
         defineField({ name: "heading", title: "Heading", type: "string" }),
         defineField({ name: "description", title: "Description", type: "text", rows: 2 }),

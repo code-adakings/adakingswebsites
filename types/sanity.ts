@@ -80,22 +80,6 @@ export type SanityJournalPost = {
   seo?: Seo;
 };
 
-export type SanityCareer = {
-  slug: string;
-  title: string;
-  department: string;
-  location: string;
-  employmentType: string;
-  salary?: string;
-  description: PortableTextBlock[];
-  requirements?: string[];
-  benefits?: string[];
-  deadline?: string;
-  applicationUrl: string;
-  status: "Open" | "Closed";
-  postedAt?: string;
-};
-
 export type SanityBranch = {
   slug: string;
   name: string;
@@ -267,42 +251,7 @@ export type SanityContactPage = {
   seo?: Seo;
 };
 
-export type CareersWhyCard = {
-  icon: string;
-  title: string;
-  description?: string;
-};
-
-export type CareersProcessStep = {
-  icon: string;
-  title: string;
-  description?: string;
-};
-
-export type CareersValue = {
-  title: string;
-  description?: string;
-};
-
-export type SanityCareersPage = {
-  hero?: PageHero;
-  image?: SanityImage;
-  cvCtaLabel?: string;
-  whyWorkHere?: { eyebrow?: string; heading?: string; description?: string; cards?: CareersWhyCard[] };
-  lifeAtAdakings?: {
-    eyebrow?: string;
-    heading?: string;
-    description?: string;
-    gallery?: SanityImage[];
-    quote?: { text?: string; name?: string; role?: string };
-  };
-  departments?: { name: string; description?: string }[];
-  hiringProcess?: { eyebrow?: string; heading?: string; steps?: CareersProcessStep[] };
-  employeeValues?: { eyebrow?: string; heading?: string; description?: string; values?: CareersValue[] };
-  finalCta?: { heading?: string; description?: string; cta?: CtaLink };
-  homeCta?: { eyebrow?: string; heading?: string; description?: string; cta?: CtaLink };
-  seo?: Seo;
-};
+// Careers types live in `types/career.ts`.
 
 export type SanityCommunityImpact = {
   eyebrow?: string;

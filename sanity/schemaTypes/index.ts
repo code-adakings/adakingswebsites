@@ -12,7 +12,10 @@ import { homepage } from "./documents/homepage";
 import { journalPost } from "./documents/journalPost";
 import { author } from "./documents/author";
 import { category } from "./documents/category";
-import { career } from "./documents/career";
+import { department } from "./documents/department";
+import { jobRole } from "./documents/jobRole";
+import { jobPosting } from "./documents/jobPosting";
+import { jobApplication } from "./documents/jobApplication";
 import { branch } from "./documents/branch";
 import { testimonial } from "./documents/testimonial";
 import { leadership } from "./documents/leadership";
@@ -55,7 +58,10 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     journalPost,
     author,
     category,
-    career,
+    department,
+    jobRole,
+    jobPosting,
+    jobApplication,
     branch,
     testimonial,
     leadership,

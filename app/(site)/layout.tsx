@@ -3,6 +3,7 @@ import { VisualEditing } from "next-sanity/visual-editing";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { CookieConsent } from "@/components/consent/cookie-consent";
+import { Toaster } from "@/components/ui/sonner";
 import { getSiteSettings } from "@/lib/site-settings";
 import { JsonLd, organizationSchema, websiteSchema } from "@/lib/structured-data";
 
@@ -28,6 +29,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         contactPhone={settings.contactPhone}
         whatsapp={settings.whatsapp}
       />
+      <Toaster position="top-center" richColors />
       {isDraftMode ? <VisualEditing /> : null}
     </>
   );

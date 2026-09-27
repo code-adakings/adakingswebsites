@@ -52,6 +52,7 @@ export async function sendEmailNotification({
 }: {
   subject: string;
   text: string;
+  html?: string;
   replyTo?: string;
   to?: string;
 }): Promise<void> {

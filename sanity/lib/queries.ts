@@ -1,24 +1,7 @@
 import { defineQuery } from "next-sanity";
+import { imageFields, pageHeroFields, seoFields } from "./queries/fragments";
 
-const imageFields = /* groq */ `{
-  asset,
-  hotspot,
-  crop,
-  alt,
-}`;
-
-const seoFields = /* groq */ `{
-  metaTitle,
-  metaDescription,
-  ogImage${imageFields},
-  noIndex,
-}`;
-
-const pageHeroFields = /* groq */ `{
-  eyebrow,
-  title,
-  description,
-}`;
+// Careers queries live in `./queries/careers.ts`.
 
 export const homepageQuery = defineQuery(`
   *[_type == "homepage"][0]{
@@ -157,28 +140,6 @@ export const contactPageQuery = defineQuery(`
   }
 `);
 
-export const careersPageQuery = defineQuery(`
-  *[_type == "careersPage"][0]{
-    hero${pageHeroFields},
-    image${imageFields},
-    cvCtaLabel,
-    whyWorkHere{ eyebrow, heading, description, cards[]{ icon, title, description } },
-    lifeAtAdakings{
-      eyebrow,
-      heading,
-      description,
-      gallery[]${imageFields},
-      quote{ text, name, role },
-    },
-    departments[]{ name, description },
-    hiringProcess{ eyebrow, heading, steps[]{ icon, title, description } },
-    employeeValues{ eyebrow, heading, description, values[]{ title, description } },
-    finalCta{ heading, description, cta },
-    homeCta{ eyebrow, heading, description, cta },
-    seo${seoFields},
-  }
-`);
-
 export const communityImpactQuery = defineQuery(`
   *[_type == "communityImpact"][0]{
     eyebrow,
@@ -301,26 +262,6 @@ export const journalPostsForSitemapQuery = defineQuery(`
 
 export const journalCategoriesQuery = defineQuery(`
   array::unique(*[_type == "journalPost" && count(categories) > 0].categories[]->title)
-`);
-
-const careerFields = /* groq */ `{
-  "slug": slug.current,
-  title,
-  department,
-  location,
-  employmentType,
-  salary,
-  description,
-  requirements,
-  benefits,
-  deadline,
-  applicationUrl,
-  status,
-  postedAt,
-}`;
-
-export const openCareersQuery = defineQuery(`
-  *[_type == "career" && status == "Open"] | order(postedAt desc) ${careerFields}
 `);
 
 const branchFields = /* groq */ `{

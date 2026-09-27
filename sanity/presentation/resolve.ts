@@ -91,12 +91,22 @@ export const resolve: PresentationPluginOptions["resolve"] = {
         message: "Listed on the Branches page",
       }),
     }),
-    career: defineLocations({
-      select: { title: "title" },
+    jobPosting: defineLocations({
+      select: { title: "title", slug: "slug.current" },
       resolve: (doc) => ({
-        locations: [{ title: doc?.title || "Untitled", href: "/careers" }],
-        message: "Listed on the Careers page",
+        locations: [
+          { title: doc?.title || "Untitled", href: `/careers/${doc?.slug}` },
+          { title: "Careers", href: "/careers" },
+        ],
       }),
+    }),
+    jobRole: defineLocations({
+      locations: [{ title: "Careers", href: "/careers" }],
+      message: "Shown on every job posting for this role",
+    }),
+    department: defineLocations({
+      locations: [{ title: "Careers", href: "/careers" }],
+      message: "Listed in the Culture section and on job postings in this department",
     }),
   },
   mainDocuments: [
@@ -108,6 +118,11 @@ export const resolve: PresentationPluginOptions["resolve"] = {
     { route: "/franchise", type: "franchisePage" },
     { route: "/contact", type: "contactPage" },
     { route: "/careers", type: "careersPage" },
+    {
+      route: "/careers/:slug",
+      filter: `_type == "jobPosting" && slug.current == $slug`,
+      params: ({ params }) => ({ slug: params.slug }),
+    },
     { route: "/branches", type: "branchesPage" },
     { route: "/journal", type: "journalPage" },
     {

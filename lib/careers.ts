@@ -1,9 +1,20 @@
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { careersPageQuery, openCareersQuery } from "@/sanity/lib/queries";
-import type { SanityCareer, SanityCareersPage, Seo } from "@/types/sanity";
+import {
+  allOpenJobsQuery,
+  careerPageQuery,
+  departmentsQuery,
+  featuredJobsQuery,
+  jobBySlugQuery,
+} from "@/sanity/lib/queries/careers";
+import { todayIso } from "@/lib/career-utils";
+import type { Department, JobPosting, JobPostingCard, SanityCareersPage } from "@/types/career";
+import type { Seo } from "@/types/sanity";
 
-const CAREER_TAG = "career";
 const CAREERS_PAGE_TAG = "careersPage";
+const DEPARTMENT_TAG = "department";
+// A posting projection dereferences its role, department and branch, so a
+// publish on any of those types must also revalidate job listings.
+const JOB_TAGS = ["jobPosting", "jobRole", DEPARTMENT_TAG, "branch"];
 
 const FALLBACK_HERO: NonNullable<SanityCareersPage["hero"]> = {
   eyebrow: "Careers",
@@ -12,7 +23,7 @@ const FALLBACK_HERO: NonNullable<SanityCareersPage["hero"]> = {
 };
 
 const FALLBACK_WHY_WORK_HERE: NonNullable<SanityCareersPage["whyWorkHere"]> = {
-  eyebrow: "Why Work Here",
+  eyebrow: "Why Work at Adakings",
   heading: "A place to build a career, not just work a shift",
   description: "We're growing fast across Ghana, and we grow our people alongside the business.",
   cards: [
@@ -30,18 +41,19 @@ const FALLBACK_LIFE_AT_ADAKINGS: NonNullable<SanityCareersPage["lifeAtAdakings"]
   gallery: [],
 };
 
-const FALLBACK_DEPARTMENTS: NonNullable<SanityCareersPage["departments"]> = [
-  { name: "Kitchen & Culinary", description: "Line cooks, chefs, and kitchen leadership." },
-  { name: "Branch Operations", description: "Shift leads, supervisors, and branch managers." },
-  { name: "Delivery & Logistics", description: "Riders and dispatch coordinators." },
-  { name: "Corporate & Support", description: "Marketing, finance, HR, and operations support." },
+/** Shown under the culture gallery until Department documents exist in the Studio. */
+const FALLBACK_DEPARTMENTS: Department[] = [
+  { _id: "fallback-kitchen", title: "Kitchen Operations", slug: "kitchen-operations", icon: "chef-hat", description: "Chefs, line cooks, and kitchen assistants who keep every order fresh and fast." },
+  { _id: "fallback-customer", title: "Customer Operations", slug: "customer-operations", icon: "headset", description: "Front desk and packing teams who make every visit and pickup smooth." },
+  { _id: "fallback-delivery", title: "Delivery Operations", slug: "delivery-operations", icon: "bike", description: "Riders who get hot meals to customers across campus and the city." },
+  { _id: "fallback-marketing", title: "Marketing & Growth", slug: "marketing-growth", icon: "megaphone", description: "Storytellers and growth builders who bring new customers to Adakings." },
 ];
 
 const FALLBACK_HIRING_PROCESS: NonNullable<SanityCareersPage["hiringProcess"]> = {
   eyebrow: "Hiring Process",
   heading: "What to expect when you apply",
   steps: [
-    { icon: "file-text", title: "Apply", description: "Send your CV or apply directly to an open role." },
+    { icon: "file-text", title: "Apply", description: "Apply online to an open role — it takes about five minutes." },
     { icon: "phone-call", title: "Screening", description: "A quick call to learn more about you and the role." },
     { icon: "users", title: "Interview", description: "Meet the branch or department team in person." },
     { icon: "clipboard-check", title: "Offer", description: "We'll follow up with next steps and an offer." },
@@ -49,21 +61,34 @@ const FALLBACK_HIRING_PROCESS: NonNullable<SanityCareersPage["hiringProcess"]> =
   ],
 };
 
-const FALLBACK_EMPLOYEE_VALUES: NonNullable<SanityCareersPage["employeeValues"]> = {
-  eyebrow: "Employee Values",
-  heading: "What we look for in every team member",
-  values: [
-    { title: "Hospitality", description: "Treat every customer like a guest in your own home." },
-    { title: "Hustle", description: "Move with urgency, especially during a rush." },
-    { title: "Integrity", description: "Do the right thing, even when no one's watching." },
-    { title: "Teamwork", description: "Show up for your shift and for each other." },
+const FALLBACK_BENEFITS: NonNullable<SanityCareersPage["benefits"]> = {
+  eyebrow: "Benefits",
+  heading: "We take care of the people who take care of our customers",
+  items: [
+    { icon: "wallet", title: "Competitive, on-time pay", description: "Fair wages paid on schedule, every month." },
+    { icon: "utensils", title: "Staff meals", description: "Enjoy Adakings meals on every shift." },
+    { icon: "graduation-cap", title: "Paid training", description: "Learn food safety, service, and leadership on the job." },
+    { icon: "trending-up", title: "Promotion from within", description: "Most of our shift leads started on the line." },
+    { icon: "shield-check", title: "Safe workplace", description: "Proper equipment, hygiene standards, and support." },
+    { icon: "calendar-clock", title: "Predictable rotas", description: "Shift schedules shared in advance, with room for students." },
   ],
 };
 
-const FALLBACK_FINAL_CTA: NonNullable<SanityCareersPage["finalCta"]> = {
-  heading: "Ready to join the team?",
-  description: "Check our open roles or send us your CV — we're always looking for great people.",
-  cta: { label: "View Open Roles", href: "#open-roles" },
+const FALLBACK_FAQ: NonNullable<SanityCareersPage["faq"]> = {
+  eyebrow: "FAQ",
+  heading: "Questions candidates often ask",
+  items: [
+    { question: "Do I need previous experience?", answer: "Not for most entry-level roles. We train you on the job — we look for reliability, a good attitude, and a willingness to learn." },
+    { question: "Can I work part-time while studying?", answer: "Yes. Many of our team members are students, and several roles are offered part-time with flexible shifts." },
+    { question: "How long does the hiring process take?", answer: "Usually one to two weeks from application to offer, depending on the role." },
+    { question: "Do I need a CV to apply?", answer: "It's optional, but we strongly recommend attaching one (PDF, up to 4 MB). It gives us a much fuller picture of your experience. If you don't have one, tell us about yourself in the application form." },
+    { question: "What if there's no role that fits me right now?", answer: "Join our talent pool below and we'll contact you when a suitable role opens up." },
+  ],
+};
+
+const FALLBACK_TALENT_POOL: Omit<NonNullable<SanityCareersPage["talentPool"]>, "cta"> = {
+  heading: "Don't see the right role?",
+  description: "Join the Adakings talent pool and we'll reach out when something that fits you opens up.",
 };
 
 const FALLBACK_HOME_CTA: NonNullable<SanityCareersPage["homeCta"]> = {
@@ -74,41 +99,64 @@ const FALLBACK_HOME_CTA: NonNullable<SanityCareersPage["homeCta"]> = {
   cta: { label: "View Open Roles", href: "/careers" },
 };
 
-export async function getOpenCareers(): Promise<SanityCareer[]> {
-  return sanityFetch<SanityCareer[]>({
-    query: openCareersQuery,
-    tags: [CAREER_TAG],
+export async function getFeaturedJobs(): Promise<JobPostingCard[]> {
+  return sanityFetch<JobPostingCard[]>({
+    query: featuredJobsQuery,
+    params: { today: todayIso() },
+    tags: JOB_TAGS,
   });
+}
+
+export async function getOpenJobs(): Promise<JobPostingCard[]> {
+  return sanityFetch<JobPostingCard[]>({
+    query: allOpenJobsQuery,
+    params: { today: todayIso() },
+    tags: JOB_TAGS,
+  });
+}
+
+export async function getJobBySlug(slug: string): Promise<JobPosting | null> {
+  return sanityFetch<JobPosting | null>({
+    query: jobBySlugQuery,
+    params: { slug },
+    tags: JOB_TAGS,
+  });
+}
+
+export async function getDepartments(): Promise<Department[]> {
+  const departments = await sanityFetch<Department[]>({
+    query: departmentsQuery,
+    tags: [DEPARTMENT_TAG],
+  });
+  return departments.length ? departments : FALLBACK_DEPARTMENTS;
 }
 
 export async function getCareersPage(): Promise<{
   hero: NonNullable<SanityCareersPage["hero"]>;
   image?: SanityCareersPage["image"];
-  cvCtaLabel: string;
   whyWorkHere: NonNullable<SanityCareersPage["whyWorkHere"]>;
   lifeAtAdakings: NonNullable<SanityCareersPage["lifeAtAdakings"]>;
-  departments: NonNullable<SanityCareersPage["departments"]>;
   hiringProcess: NonNullable<SanityCareersPage["hiringProcess"]>;
-  employeeValues: NonNullable<SanityCareersPage["employeeValues"]>;
-  finalCta: NonNullable<SanityCareersPage["finalCta"]>;
+  benefits: NonNullable<SanityCareersPage["benefits"]>;
+  faq: NonNullable<SanityCareersPage["faq"]>;
+  talentPool: NonNullable<SanityCareersPage["talentPool"]>;
   homeCta: NonNullable<SanityCareersPage["homeCta"]>;
   seo?: Seo;
 }> {
   const page = await sanityFetch<SanityCareersPage | null>({
-    query: careersPageQuery,
+    query: careerPageQuery,
     tags: [CAREERS_PAGE_TAG],
   });
 
   return {
     hero: page?.hero?.title ? page.hero : FALLBACK_HERO,
     image: page?.image,
-    cvCtaLabel: page?.cvCtaLabel || "Send Us Your CV",
     whyWorkHere: page?.whyWorkHere?.cards?.length ? page.whyWorkHere : FALLBACK_WHY_WORK_HERE,
     lifeAtAdakings: page?.lifeAtAdakings?.heading ? page.lifeAtAdakings : FALLBACK_LIFE_AT_ADAKINGS,
-    departments: page?.departments?.length ? page.departments : FALLBACK_DEPARTMENTS,
     hiringProcess: page?.hiringProcess?.steps?.length ? page.hiringProcess : FALLBACK_HIRING_PROCESS,
-    employeeValues: page?.employeeValues?.values?.length ? page.employeeValues : FALLBACK_EMPLOYEE_VALUES,
-    finalCta: page?.finalCta?.heading ? page.finalCta : FALLBACK_FINAL_CTA,
+    benefits: page?.benefits?.items?.length ? page.benefits : FALLBACK_BENEFITS,
+    faq: page?.faq?.items?.length ? page.faq : FALLBACK_FAQ,
+    talentPool: page?.talentPool?.heading ? page.talentPool : FALLBACK_TALENT_POOL,
     homeCta: page?.homeCta?.heading ? page.homeCta : FALLBACK_HOME_CTA,
     seo: page?.seo,
   };

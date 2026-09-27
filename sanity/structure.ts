@@ -26,6 +26,7 @@ import type { StructureResolver } from "sanity/structure";
 import { singletonTypes } from "./schemaTypes";
 import { LENDING_SETTINGS_ID } from "./schemaTypes/documents/lendingSettings";
 import { STATUSES, STATUS_LABELS } from "../lib/lending/shared";
+import { APPLICATION_STATUSES } from "../types/career";
 
 const singleton = (
   S: Parameters<StructureResolver>[0],
@@ -45,7 +46,10 @@ const explicitCollectionTypes = new Set([
   "journalPost",
   "author",
   "category",
-  "career",
+  "department",
+  "jobRole",
+  "jobPosting",
+  "jobApplication",
   "branch",
   "testimonial",
   "leadership",
@@ -112,7 +116,65 @@ export const structure: StructureResolver = (S) =>
             .title("Careers")
             .items([
               singleton(S, "careersPage", "Careers Page Settings", CaseIcon),
-              S.documentTypeListItem("career").title("Open Roles").icon(CaseIcon),
+              S.divider(),
+              S.listItem()
+                .id("jobPosting-open")
+                .title("Open Postings")
+                .icon(CaseIcon)
+                .child(
+                  S.documentList()
+                    .title("Open Postings")
+                    .schemaType("jobPosting")
+                    .filter('_type == "jobPosting" && status == "Open"')
+                    .defaultOrdering([{ field: "postedAt", direction: "desc" }]),
+                ),
+              S.documentTypeListItem("jobPosting").title("All Job Postings").icon(CaseIcon),
+              S.divider(),
+              S.documentTypeListItem("jobRole").title("Job Roles").icon(UserIcon),
+              S.documentTypeListItem("department").title("Departments").icon(UsersIcon),
+              S.divider(),
+              S.listItem()
+                .id("jobApplications")
+                .title("Applications")
+                .icon(DocumentTextIcon)
+                .child(
+                  S.list()
+                    .title("Applications")
+                    .items([
+                      ...APPLICATION_STATUSES.map((status) =>
+                        S.listItem()
+                          .id(`jobApplication-${status.toLowerCase()}`)
+                          .title(status)
+                          .icon(DocumentTextIcon)
+                          .child(
+                            S.documentList()
+                              .title(`${status} applications`)
+                              .schemaType("jobApplication")
+                              .filter('_type == "jobApplication" && status == $status')
+                              .params({ status })
+                              .defaultOrdering([{ field: "submittedAt", direction: "desc" }]),
+                          ),
+                      ),
+                      S.divider(),
+                      S.listItem()
+                        .id("jobApplication-by-job")
+                        .title("By job posting")
+                        .icon(CaseIcon)
+                        .child(
+                          S.documentTypeList("jobPosting")
+                            .title("Pick a job posting")
+                            .child((jobId) =>
+                              S.documentList()
+                                .title("Applications")
+                                .schemaType("jobApplication")
+                                .filter('_type == "jobApplication" && job._ref == $jobId')
+                                .params({ jobId })
+                                .defaultOrdering([{ field: "submittedAt", direction: "desc" }]),
+                            ),
+                        ),
+                      S.documentTypeListItem("jobApplication").title("All applications"),
+                    ]),
+                ),
             ]),
         ),
       singleton(S, "franchisePage", "Franchise", RocketIcon),
