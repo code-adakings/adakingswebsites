@@ -41,7 +41,7 @@ export type JobBranch = {
   city?: string;
 };
 
-/** Projection used by listings (cards, featured grid, homepage, sitemap). */
+/** Projection used by listings (cards, open roles grid, homepage, sitemap). */
 export type JobPostingCard = {
   _id: string;
   slug: string;
@@ -49,7 +49,6 @@ export type JobPostingCard = {
   employmentType: EmploymentType;
   salary?: string;
   location: string;
-  featured: boolean;
   status: JobStatus;
   /** ISO date (YYYY-MM-DD). */
   deadline?: string;

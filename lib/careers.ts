@@ -3,8 +3,8 @@ import {
   allOpenJobsQuery,
   careerPageQuery,
   departmentsQuery,
-  featuredJobsQuery,
   jobBySlugQuery,
+  urgentJobsQuery,
 } from "@/sanity/lib/queries/careers";
 import { todayIso } from "@/lib/career-utils";
 import type { Department, JobPosting, JobPostingCard, SanityCareersPage } from "@/types/career";
@@ -99,12 +99,24 @@ const FALLBACK_HOME_CTA: NonNullable<SanityCareersPage["homeCta"]> = {
   cta: { label: "View Open Roles", href: "/careers" },
 };
 
-export async function getFeaturedJobs(): Promise<JobPostingCard[]> {
-  return sanityFetch<JobPostingCard[]>({
-    query: featuredJobsQuery,
+/** Most roles the Careers page and homepage list; the rest stay hidden. */
+const LISTED_JOBS_LIMIT = 3;
+
+/**
+ * The roles listed on the Careers page and homepage: the "Top 3 urgent roles"
+ * picked in Careers Page Settings, or the newest open postings when none of
+ * the picks are open. Unlisted postings keep their own pages.
+ */
+export async function getListedJobs(): Promise<JobPostingCard[]> {
+  const urgent = await sanityFetch<JobPostingCard[] | null>({
+    query: urgentJobsQuery,
     params: { today: todayIso() },
-    tags: JOB_TAGS,
+    tags: [CAREERS_PAGE_TAG, ...JOB_TAGS],
   });
+  if (urgent?.length) return urgent.slice(0, LISTED_JOBS_LIMIT);
+
+  const open = await getOpenJobs();
+  return open.slice(0, LISTED_JOBS_LIMIT);
 }
 
 export async function getOpenJobs(): Promise<JobPostingCard[]> {

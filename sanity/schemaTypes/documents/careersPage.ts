@@ -31,7 +31,8 @@ export const careersPage = defineType({
   type: "document",
   icon: CaseIcon,
   groups: [
-    { name: "hero", title: "Hero", default: true },
+    { name: "openRoles", title: "Open Roles", default: true },
+    { name: "hero", title: "Hero" },
     { name: "whyWorkHere", title: "Why Work Here" },
     { name: "culture", title: "Culture Gallery" },
     { name: "hiringProcess", title: "Hiring Process" },
@@ -48,6 +49,22 @@ export const careersPage = defineType({
       type: "string",
       initialValue: "Careers Page",
       readOnly: true,
+    }),
+    defineField({
+      name: "urgentJobs",
+      title: "Top 3 urgent roles",
+      type: "array",
+      group: "openRoles",
+      description:
+        "The only roles listed on the Careers page and the homepage, in this order (drag to reorder). Every other open posting stays hidden from those listings but its own page still works, so you can share the link directly. Leave empty to show the three newest open postings.",
+      of: [
+        {
+          type: "reference",
+          to: [{ type: "jobPosting" }],
+          options: { filter: 'status == "Open"', disableNew: true },
+        },
+      ],
+      validation: (rule) => rule.max(3).unique(),
     }),
     defineField({ name: "hero", title: "Hero", type: "pageHero", group: "hero" }),
     defineField({
