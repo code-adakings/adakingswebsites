@@ -91,7 +91,7 @@ Then the rest, in whatever order — each is independent:
    - `NEXT_PUBLIC_SANITY_API_VERSION`
    - `SANITY_REVALIDATE_SECRET`
 4. Click **Deploy**. Vercel gives you a URL like `adakings-websites.vercel.app` — to use `adakings.com` instead, add it under Project Settings → Domains and follow Vercel's DNS instructions.
-5. Back in **sanity.io/manage → API → CORS Origins**, add your real domain (`https://adakings.com` and/or the `.vercel.app` URL), same as Part A step 5, with "Allow credentials" checked — otherwise `/studio` will work locally but not in production.
+5. Back in **sanity.io/manage → API → CORS Origins**, add every domain that will actually load `/studio` in a browser (same as Part A step 5, with "Allow credentials" checked) — otherwise `/studio` will work locally but not in production. CORS matches the exact origin in the address bar, so a redirecting domain doesn't count: if `adakings.com` 308-redirects to `www.adakings.com`, add `https://www.adakings.com`, not the bare apex. Add the `.vercel.app` URL too if you'll ever open Studio there directly.
 
 ### Part E — Instant updates (webhook, ~2 minutes, recommended)
 

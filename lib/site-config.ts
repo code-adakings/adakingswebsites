@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "Adakings",
   legalName: "Adakings Franchise Corporation Ltd.",
-  url: "https://adakings.com",
+  url: "https://www.adakings.com",
   description:
     "Adakings is a premium Ghanaian black-owned fast food and hospitality company — discover our story, branches, catering, franchise opportunities, and careers.",
   orderUrl: "https://adakingsapp.com",
