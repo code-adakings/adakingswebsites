@@ -14,25 +14,36 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "Adakings Website <onboardin
 
 export const NOTIFY_EMAIL = process.env.NEW_FRONTIERS_NOTIFY_EMAIL || siteConfig.contact.supportEmail;
 
+/**
+ * FROM_EMAIL's address under a different display name, so other site areas
+ * (e.g. careers) don't show up as the default sender in inboxes.
+ */
+export function senderAs(displayName: string): string {
+  const address = FROM_EMAIL.match(/<([^>]+)>/)?.[1] ?? FROM_EMAIL.trim();
+  return `${displayName} <${address}>`;
+}
+
 export async function sendEmail({
   to,
   subject,
   text,
   html,
   replyTo,
+  from = FROM_EMAIL,
 }: {
   to: string;
   subject: string;
   text: string;
   html?: string;
   replyTo?: string;
+  from?: string;
 }): Promise<void> {
   if (!resend) {
     throw new Error("RESEND_API_KEY is not configured — skipping email");
   }
 
   const { error } = await resend.emails.send({
-    from: FROM_EMAIL,
+    from,
     to,
     replyTo,
     subject,
@@ -55,6 +66,7 @@ export async function sendEmailNotification({
   html?: string;
   replyTo?: string;
   to?: string;
+  from?: string;
 }): Promise<void> {
   await sendEmail({ to, ...email });
 }

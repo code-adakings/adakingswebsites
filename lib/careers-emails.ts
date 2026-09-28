@@ -1,9 +1,12 @@
 import "server-only";
-import { NOTIFY_EMAIL, sendEmailNotification } from "@/lib/email";
+import { NOTIFY_EMAIL, sendEmailNotification, senderAs } from "@/lib/email";
 import { siteConfig } from "@/lib/site-config";
 
 /** Hiring-team inbox. Falls back to the general form-notification address. */
 export const CAREERS_NOTIFY_EMAIL = process.env.CAREERS_NOTIFY_EMAIL || NOTIFY_EMAIL;
+
+/** Careers sender. Must be on a Resend-verified domain; defaults to the site sender renamed. */
+const CAREERS_FROM_EMAIL = process.env.CAREERS_FROM_EMAIL || senderAs("Adakings Careers");
 
 export type NewApplicationAlert = {
   applicationId: string;
@@ -71,6 +74,7 @@ export async function sendNewApplicationAlert(app: NewApplicationAlert): Promise
 
   await sendEmailNotification({
     to: CAREERS_NOTIFY_EMAIL,
+    from: CAREERS_FROM_EMAIL,
     subject: `New application: ${app.jobTitle} · ${app.fullName}${app.hasCv ? "" : " (no CV)"}`,
     text,
     html,
